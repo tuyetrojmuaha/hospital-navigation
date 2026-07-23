@@ -12,8 +12,12 @@
  * xem ảnh có thước đo pixel (hoặc Photoshop/GIMP), rê chuột vào đúng tâm mỗi
  * khu nhà để đọc toạ độ pixel thật, rồi sửa lại x,y tương ứng.
  *
- * Node = một điểm mốc (cổng, hoặc khu nhà) -> cũng là nội dung mã QR dán tại đó.
- * Edge = một đoạn lối đi nối 2 mốc (không cần vẽ chi tiết từng ngã rẽ nhỏ).
+ * Node = một điểm mốc. Có 3 loại:
+ *   - Khu nhà / cổng (isDestination / isGate): nơi có thể là điểm bắt đầu (quét QR) hoặc đích đến.
+ *   - Waypoint (isWaypoint): điểm gãy của lối đi thật (sân/đường trống), CHỈ dùng để dẫn đường
+ *     cho đúng theo lối đi thực tế, không hiện trong danh sách chọn đích và không có trong QR.
+ * Edge = một đoạn lối đi nối 2 mốc. Để đường đi không cắt xuyên qua nhà khác, mỗi khu nhà/cổng
+ * chỉ nên nối tới waypoint gần nhất (không nối thẳng khu nhà này với khu nhà kia).
  * Trọng số (weight) của edge được TỰ TÍNH bằng khoảng cách toạ độ (xem app.js),
  * trừ khi bạn tự khai báo weight cụ thể để ép theo khoảng cách đo thực tế.
  */
@@ -51,30 +55,71 @@ const HOSPITAL_MAP = {
     { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 610, y: 662,  floor: 1, isDestination: true },
     { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 610, y: 740,  floor: 1, isDestination: true },
     { id: "B16", name: "Nhà tang lễ",                           x: 420, y: 1142, floor: 1, isDestination: true },
+
+    // ----- ĐIỂM NÚT LỐI ĐI (waypoint) -----
+    // Đây KHÔNG phải nơi đến, chỉ là điểm gãy của lối đi thật (sân/đường trống giữa các khu nhà),
+    // để đường vẽ ra và lời chỉ dẫn đi theo đúng lối đi thực tế thay vì cắt thẳng qua nhà.
+    { id: "P_N",   name: "Lối đi phía Bắc (gần cổng 1B)",        x: 230, y: 320, floor: 1, isWaypoint: true },
+    { id: "P_NE",  name: "Lối đi phía Bắc (gần cổng 1A)",        x: 430, y: 320, floor: 1, isWaypoint: true },
+    { id: "P_W1",  name: "Lối đi Tây 1 (gần cổng Cấp cứu)",      x: 230, y: 460, floor: 1, isWaypoint: true },
+    { id: "P_C1",  name: "Lối đi Trung tâm 1",                    x: 400, y: 460, floor: 1, isWaypoint: true },
+    { id: "P_E1",  name: "Lối đi Đông 1",                         x: 560, y: 460, floor: 1, isWaypoint: true },
+    { id: "P_W2",  name: "Lối đi Tây 2 (cạnh Toà Tháp đôi)",      x: 200, y: 650, floor: 1, isWaypoint: true },
+    { id: "P_C2",  name: "Lối đi Trung tâm 2 (sân vườn)",         x: 400, y: 620, floor: 1, isWaypoint: true },
+    { id: "P_E2",  name: "Lối đi Đông 2",                         x: 580, y: 650, floor: 1, isWaypoint: true },
+    { id: "P_C3",  name: "Lối đi Trung tâm 3",                    x: 430, y: 760, floor: 1, isWaypoint: true },
+    { id: "P_E3",  name: "Lối đi Đông 3",                         x: 580, y: 750, floor: 1, isWaypoint: true },
+    { id: "P_W3",  name: "Lối đi Tây 3 (gần Nhà lưu trữ)",        x: 200, y: 850, floor: 1, isWaypoint: true },
+    { id: "P_S1",  name: "Lối đi Nam 1 (gần Viện Truyền nhiễm)",  x: 300, y: 950, floor: 1, isWaypoint: true },
+    { id: "P_S2",  name: "Lối đi Nam 2 (hướng Nhà tang lễ)",      x: 400, y: 1050, floor: 1, isWaypoint: true },
   ],
 
-  // Lối đi giữa các mốc - dựa theo cách bố trí sân/đường nội bộ trong sơ đồ.
+  // Lối đi giữa các mốc - đi theo khoảng SÂN/ĐƯỜNG TRỐNG thực tế trên sơ đồ (qua các waypoint P_...),
+  // KHÔNG nối thẳng building với building nữa để tránh cắt xuyên qua nhà khác.
   // Có thể chỉnh lại nếu thực tế lối đi khác (ví dụ có hàng rào, cầu nối riêng...).
   edges: [
-    { from: "G_1B", to: "B01" },
-    { from: "G_1A", to: "B02" },
-    { from: "B01", to: "B03" },
-    { from: "B01", to: "B05" },
-    { from: "B03", to: "B02" },
-    { from: "B02", to: "B04" },
-    { from: "B02", to: "B07" },
-    { from: "B05", to: "B08" },
-    { from: "B08", to: "G_CC" },
-    { from: "B07", to: "B06" },
-    { from: "B06", to: "B09" },
-    { from: "B09", to: "B10" },
-    { from: "B09", to: "B14" },
-    { from: "B10", to: "B15" },
-    { from: "B08", to: "B11" },
-    { from: "B11", to: "B13" },
-    { from: "B13", to: "G_5" },
-    { from: "G_5", to: "B12" },
-    { from: "B11", to: "B16" },
+    // khung xương lối đi chính (waypoint - waypoint)
+    { from: "P_N",  to: "P_NE" },
+    { from: "P_N",  to: "P_W1" },
+    { from: "P_NE", to: "P_E1" },
+    { from: "P_W1", to: "P_C1" },
+    { from: "P_C1", to: "P_E1" },
+    { from: "P_W1", to: "P_W2" },
+    { from: "P_C1", to: "P_C2" },
+    { from: "P_E1", to: "P_E2" },
+    { from: "P_W2", to: "P_C2" },
+    { from: "P_C2", to: "P_E2" },
+    { from: "P_W2", to: "P_W3" },
+    { from: "P_C2", to: "P_C3" },
+    { from: "P_E2", to: "P_E3" },
+    { from: "P_C3", to: "P_E3" },
+    { from: "P_W3", to: "P_S1" },
+    { from: "P_C3", to: "P_S1" },
+    { from: "P_S1", to: "P_S2" },
+
+    // cổng ra vào nối vào lối đi gần nhất
+    { from: "G_1B", to: "P_N" },
+    { from: "G_1A", to: "P_NE" },
+    { from: "G_CC", to: "P_W1" },
+    { from: "G_5",  to: "P_S1" },
+
+    // khu nhà nối vào lối đi gần nhất (không nối thẳng nhà-với-nhà)
+    { from: "B01", to: "P_N" },
+    { from: "B05", to: "P_W1" },
+    { from: "B03", to: "P_C1" },
+    { from: "B04", to: "P_C1" },
+    { from: "B02", to: "P_NE" },
+    { from: "B07", to: "P_E1" },
+    { from: "B06", to: "P_C1" },
+    { from: "B08", to: "P_W2" },
+    { from: "B09", to: "P_C2" },
+    { from: "B14", to: "P_E2" },
+    { from: "B10", to: "P_C3" },
+    { from: "B15", to: "P_E3" },
+    { from: "B13", to: "P_W3" },
+    { from: "B11", to: "P_S1" },
+    { from: "B12", to: "P_S1" },
+    { from: "B16", to: "P_S2" },
   ],
 };
 

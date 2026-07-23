@@ -87,9 +87,12 @@ function generateDirections(pathResult, destination) {
   const instructions = [];
   let prevBearing = null;
 
-  steps.forEach((step) => {
+  steps.forEach((step, idx) => {
     const fromNode = nodeById[step.from];
     const toNode = nodeById[step.to];
+    const isLastStep = idx === steps.length - 1;
+    // Chỉ nêu tên đích thật (khu nhà/cổng) trong câu chỉ dẫn, không nêu tên waypoint kỹ thuật
+    const targetLabel = toNode.isWaypoint ? null : toNode.name;
 
     if (step.edge.isElevator) {
       instructions.push({
@@ -102,11 +105,18 @@ function generateDirections(pathResult, destination) {
 
     const curBearing = bearing(fromNode, toNode);
     if (prevBearing === null) {
-      instructions.push({ text: `Đi thẳng về hướng ${toNode.name}`, icon: "⬆️" });
+      instructions.push({
+        text: targetLabel ? `Đi thẳng về hướng ${targetLabel}` : "Đi thẳng theo lối đi",
+        icon: "⬆️",
+      });
     } else {
       const turn = turnLabel(prevBearing, curBearing);
       const icon = turn === "rẽ trái" ? "⬅️" : turn === "rẽ phải" ? "➡️" : turn === "quay lại" ? "🔄" : "⬆️";
-      instructions.push({ text: `${turn.charAt(0).toUpperCase() + turn.slice(1)}, hướng tới ${toNode.name}`, icon });
+      const turnText = turn.charAt(0).toUpperCase() + turn.slice(1);
+      instructions.push({
+        text: targetLabel && !isLastStep ? `${turnText}, hướng tới ${targetLabel}` : turnText,
+        icon,
+      });
     }
     prevBearing = curBearing;
   });
