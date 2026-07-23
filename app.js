@@ -198,10 +198,10 @@ function renderMap(svgEl, pathResult, currentFloor) {
 // ============================================================
 // 5. STATE & ĐIỀU HƯỚNG GIỮA CÁC MÀN HÌNH
 // ============================================================
-const state = { currentNodeId: null, destinationId: null, qrScanner: null };
+const state = { currentNodeId: null, destinationId: null };
 
 const screens = {
-  scan: document.getElementById("screen-scan"),
+  noLocation: document.getElementById("screen-no-location"),
   destination: document.getElementById("screen-destination"),
   directions: document.getElementById("screen-directions"),
 };
@@ -300,56 +300,48 @@ function renderFloorTabs(floors, result) {
 }
 
 // ============================================================
-// 6. QUÉT MÃ QR BẰNG CAMERA (thư viện html5-qrcode)
+// 6. XÁC ĐỊNH VỊ TRÍ TỪ ĐƯỜNG LINK CỦA MÃ QR (?node=...)
 // ============================================================
-function startQrScanner() {
-  const readerId = "qr-reader";
-  state.qrScanner = new Html5Qrcode(readerId);
-  const config = { fps: 10, qrbox: { width: 240, height: 240 } };
-
-  state.qrScanner
-    .start(
-      { facingMode: "environment" },
-      config,
-      (decodedText) => onQrScanSuccess(decodedText),
-      () => {} // lỗi từng frame (không tìm thấy mã) - bỏ qua, không cần hiện lỗi
-    )
-    .catch((err) => {
-      document.getElementById("scan-error").textContent =
-        "Không thể mở camera. Hãy cấp quyền camera cho trình duyệt và đảm bảo trang chạy trên HTTPS.";
-      console.error(err);
-    });
-}
-
-function onQrScanSuccess(decodedText) {
-  const nodeId = decodedText.trim();
+// Mã QR dán trên tường giờ chứa 1 đường link dạng:
+//   https://ten-mien-cua-ban/index.html?node=B08
+// Khi người dùng quét bằng camera điện thoại và bấm vào link, trình duyệt mở
+// đúng trang này kèm tham số "node" -> app tự nhận vị trí, KHÔNG cần mở camera
+// quét lại bên trong trang.
+function setCurrentLocation(nodeId) {
   if (!nodeById[nodeId]) {
     document.getElementById("scan-error").textContent =
-      `Mã QR không hợp lệ (${nodeId}). Vui lòng thử lại hoặc gọi nhân viên hỗ trợ.`;
+      `Mã QR không hợp lệ (${nodeId}). Vui lòng thử lại hoặc chọn vị trí thủ công bên dưới.`;
+    showScreen("noLocation");
     return;
   }
   state.currentNodeId = nodeId;
-  if (state.qrScanner) {
-    state.qrScanner.stop().catch(() => {});
-  }
   document.getElementById("current-location-label").textContent =
     `Vị trí hiện tại: ${nodeById[nodeId].name}`;
   populateDestinationList();
   showScreen("destination");
 }
 
-// nút "nhập thủ công" phòng khi camera lỗi / không có QR
+function tryReadLocationFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const nodeId = params.get("node");
+  if (nodeId) {
+    setCurrentLocation(nodeId.trim());
+  } else {
+    showScreen("noLocation");
+  }
+}
+
+// nút "chọn thủ công" phòng khi không có link QR (mở trang trực tiếp)
 function manualLocationSelect() {
   const select = document.getElementById("manual-location-select");
   const nodeId = select.value;
   if (!nodeId) return;
-  onQrScanSuccess(nodeId);
+  setCurrentLocation(nodeId);
 }
 
-// nút quay lại quét vị trí mới / chọn đích khác
+// nút quay lại màn hình xác định vị trí / chọn đích khác
 function backToScan() {
-  showScreen("scan");
-  startQrScanner();
+  showScreen("noLocation");
 }
 function backToDestinations() {
   showScreen("destination");
@@ -359,6 +351,9 @@ function backToDestinations() {
 // 7. KHỞI TẠO KHI TẢI TRANG
 // ============================================================
 window.addEventListener("DOMContentLoaded", () => {
+  // nạp ảnh nền thật (nhúng base64) vào thẻ <img>
+  document.getElementById("map-background").src = MAP_IMAGE.src;
+
   // đổ danh sách vào combo "chọn thủ công" (dự phòng)
   const select = document.getElementById("manual-location-select");
   HOSPITAL_MAP.nodes
@@ -374,5 +369,5 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-back-to-scan").addEventListener("click", backToScan);
   document.getElementById("btn-back-to-destinations").addEventListener("click", backToDestinations);
 
-  startQrScanner();
+  tryReadLocationFromUrl();
 });

@@ -18,9 +18,10 @@
  * trừ khi bạn tự khai báo weight cụ thể để ép theo khoảng cách đo thực tế.
  */
 
-// Ảnh nền mặt bằng thật + kích thước gốc (dùng làm viewBox cho SVG đè lên trên)
+// Ảnh nền mặt bằng thật + kích thước gốc (dùng làm viewBox cho SVG đè lên trên).
+// Nội dung ảnh (base64) nằm trong map-image.js, được nạp TRƯỚC file này trong index.html.
 const MAP_IMAGE = {
-  src: "assets/hospital-floorplan.jpg",
+  src: MAP_BACKGROUND_DATA_URL,
   width: 1000,
   height: 1298,
 };

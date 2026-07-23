@@ -20,42 +20,63 @@
 <body>
   <header class="app-header">🖨️ In mã QR dán tường (Quản trị)</header>
   <p class="no-print" style="text-align:center; padding: 8px 16px;">
-    Mỗi thẻ dưới đây tương ứng với một vị trí trong <code>map-data.js</code>.
-    In trang này (Ctrl/Cmd + P) rồi cắt dán từng mã QR lên đúng vị trí ngoài thực tế.
+    Mỗi thẻ dưới đây tương ứng với một vị trí trong <code>map-data.js</code>. Mã QR chứa
+    <strong>đường link đầy đủ</strong> tới <code>index.html</code> kèm vị trí — quét bằng camera điện thoại rồi
+    bấm vào link sẽ mở app đúng ngay vị trí đó, không cần quét lại trong app.
   </p>
+  <div class="no-print" style="max-width:480px;margin:0 auto 16px;padding:0 16px;">
+    <label for="base-url-input" style="font-size:13px;color:#6b7280;">
+      Địa chỉ trang <code>index.html</code> sau khi deploy (tự động điền, có thể sửa nếu sai):
+    </label>
+    <input id="base-url-input" type="text" class="search-input" style="margin-top:4px;" />
+  </div>
   <button class="no-print btn-secondary" style="display:block;margin:0 auto 16px;" onclick="window.print()">In tất cả mã QR</button>
 
   <div id="qr-grid" class="qr-grid"></div>
 
   <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="map-image.js"></script>
   <script src="map-data.js"></script>
   <script>
+    // Tự đoán URL của index.html dựa theo vị trí file admin.html đang chạy (cùng thư mục).
+    const guessedBaseUrl = new URL("index.html", window.location.href).href;
+    document.getElementById("base-url-input").value = guessedBaseUrl;
+
     const grid = document.getElementById("qr-grid");
-    HOSPITAL_MAP.nodes.forEach((node) => {
-      const card = document.createElement("div");
-      card.className = "qr-card";
-      const canvasHolder = document.createElement("div");
-      card.appendChild(canvasHolder);
 
-      const nameEl = document.createElement("div");
-      nameEl.className = "qr-name";
-      nameEl.textContent = node.name;
-      card.appendChild(nameEl);
+    function renderAllQrCodes() {
+      const baseUrl = document.getElementById("base-url-input").value.trim() || guessedBaseUrl;
+      grid.innerHTML = "";
+      HOSPITAL_MAP.nodes.forEach((node) => {
+        const card = document.createElement("div");
+        card.className = "qr-card";
+        const canvasHolder = document.createElement("div");
+        card.appendChild(canvasHolder);
 
-      const idEl = document.createElement("div");
-      idEl.className = "qr-id";
-      idEl.textContent = node.isGate ? `Mã: ${node.id} · Cổng` : `Mã: ${node.id} · Khu nhà`;
-      card.appendChild(idEl);
+        const nameEl = document.createElement("div");
+        nameEl.className = "qr-name";
+        nameEl.textContent = node.name;
+        card.appendChild(nameEl);
 
-      grid.appendChild(card);
+        const link = `${baseUrl}?node=${encodeURIComponent(node.id)}`;
+        const idEl = document.createElement("div");
+        idEl.className = "qr-id";
+        idEl.textContent = node.isGate ? `${node.id} · Cổng` : `${node.id} · Khu nhà`;
+        card.appendChild(idEl);
 
-      // Nội dung mã QR chính là node.id (app sẽ đọc đúng chuỗi này)
-      new QRCode(canvasHolder, {
-        text: node.id,
-        width: 160,
-        height: 160,
+        grid.appendChild(card);
+
+        // Nội dung mã QR giờ là 1 đường LINK đầy đủ, không còn là mã trần nữa.
+        new QRCode(canvasHolder, {
+          text: link,
+          width: 160,
+          height: 160,
+        });
       });
-    });
+    }
+
+    document.getElementById("base-url-input").addEventListener("change", renderAllQrCodes);
+    renderAllQrCodes();
   </script>
 </body>
 </html>

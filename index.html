@@ -9,10 +9,11 @@
 <body>
   <header class="app-header">🏥 Chỉ đường trong Bệnh viện</header>
 
-  <!-- MÀN HÌNH 1: QUÉT MÃ QR -->
-  <section id="screen-scan" class="screen">
-    <h2>Quét mã QR dán trên tường</h2>
-    <div id="qr-reader"></div>
+  <!-- MÀN HÌNH 1: CHƯA XÁC ĐỊNH ĐƯỢC VỊ TRÍ (mở trang trực tiếp, không qua link QR) -->
+  <section id="screen-no-location" class="screen hidden">
+    <h2>Xác định vị trí của bạn</h2>
+    <p>Hãy dùng camera điện thoại (hoặc app quét QR bất kỳ) quét mã QR dán trên tường,
+      sau đó bấm vào đường link hiện ra để mở lại trang này với đúng vị trí của bạn.</p>
     <p id="scan-error" class="error-text"></p>
 
     <div class="manual-fallback">
@@ -43,7 +44,7 @@
     <h2 id="directions-title"></h2>
     <div id="floor-tabs" class="floor-tabs"></div>
     <div class="map-container">
-      <img id="map-background" class="map-background" src="assets/hospital-floorplan.jpg" alt="Sơ đồ mặt bằng bệnh viện" />
+      <img id="map-background" class="map-background" alt="Sơ đồ mặt bằng bệnh viện" />
       <svg id="map-svg" class="map-svg-overlay" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <ol id="directions-list" class="directions-list"></ol>
@@ -52,8 +53,8 @@
     </div>
   </section>
 
-  <!-- Thư viện quét QR qua camera -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- map-image.js PHẢI nạp trước map-data.js vì map-data.js dùng biến MAP_BACKGROUND_DATA_URL -->
+  <script src="map-image.js"></script>
   <script src="map-data.js"></script>
   <script src="app.js"></script>
 </body>
