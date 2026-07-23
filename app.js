@@ -127,6 +127,7 @@ function generateDirections(pathResult, destination) {
 // 4. VẼ BẢN ĐỒ SVG (nền mờ + tô đậm đường đi)
 // ============================================================
 function renderMap(svgEl, pathResult, currentFloor) {
+  svgEl.setAttribute("viewBox", `0 0 ${MAP_IMAGE.width} ${MAP_IMAGE.height}`);
   svgEl.innerHTML = "";
   const ns = "http://www.w3.org/2000/svg";
   const pathNodeIds = new Set();
@@ -140,43 +141,57 @@ function renderMap(svgEl, pathResult, currentFloor) {
     });
   }
 
-  // vẽ tất cả các hành lang (mờ) của tầng hiện tại
+  // Chỉ vẽ đè lên ảnh gốc phần lộ trình cần đi, để không che các chi tiết khác của bản đồ thật.
   HOSPITAL_MAP.edges.forEach((e) => {
     const a = nodeById[e.from];
     const b = nodeById[e.to];
     if (a.floor !== currentFloor || b.floor !== currentFloor) return;
     const isOnPath = pathEdgeKeys.has(e.from + "-" + e.to);
+    if (!isOnPath) return;
     const line = document.createElementNS(ns, "line");
     line.setAttribute("x1", a.x);
     line.setAttribute("y1", a.y);
     line.setAttribute("x2", b.x);
     line.setAttribute("y2", b.y);
-    line.setAttribute("stroke", isOnPath ? "#2563eb" : "#d1d5db");
-    line.setAttribute("stroke-width", isOnPath ? "6" : "3");
+    line.setAttribute("stroke", "#2563eb");
+    line.setAttribute("stroke-width", "10");
     line.setAttribute("stroke-linecap", "round");
+    line.setAttribute("opacity", "0.85");
     svgEl.appendChild(line);
   });
 
-  // vẽ các node của tầng hiện tại
+  const startId = pathResult ? pathResult.steps[0].from : null;
+  const endId = pathResult ? pathResult.steps[pathResult.steps.length - 1].to : null;
+
   HOSPITAL_MAP.nodes.forEach((n) => {
     if (n.floor !== currentFloor) return;
-    const onPath = pathNodeIds.has(n.id);
+    if (!pathNodeIds.has(n.id)) return; // ẩn các mốc không liên quan để giữ ảnh gốc sạch sẽ
+
+    const isStart = n.id === startId;
+    const isEnd = n.id === endId;
     const circle = document.createElementNS(ns, "circle");
     circle.setAttribute("cx", n.x);
     circle.setAttribute("cy", n.y);
-    circle.setAttribute("r", onPath ? 10 : 7);
-    circle.setAttribute("fill", onPath ? "#2563eb" : "#9ca3af");
+    circle.setAttribute("r", isStart || isEnd ? 14 : 9);
+    circle.setAttribute("fill", isStart ? "#16a34a" : isEnd ? "#dc2626" : "#2563eb");
+    circle.setAttribute("stroke", "white");
+    circle.setAttribute("stroke-width", "3");
     svgEl.appendChild(circle);
 
-    const label = document.createElementNS(ns, "text");
-    label.setAttribute("x", n.x);
-    label.setAttribute("y", n.y - 14);
-    label.setAttribute("text-anchor", "middle");
-    label.setAttribute("font-size", "13");
-    label.setAttribute("fill", onPath ? "#1e3a8a" : "#6b7280");
-    label.setAttribute("font-weight", onPath ? "700" : "400");
-    label.textContent = n.name;
-    svgEl.appendChild(label);
+    if (isStart || isEnd) {
+      const label = document.createElementNS(ns, "text");
+      label.setAttribute("x", n.x);
+      label.setAttribute("y", n.y - 20);
+      label.setAttribute("text-anchor", "middle");
+      label.setAttribute("font-size", "22");
+      label.setAttribute("font-weight", "700");
+      label.setAttribute("fill", isStart ? "#166534" : "#991b1b");
+      label.setAttribute("paint-order", "stroke");
+      label.setAttribute("stroke", "white");
+      label.setAttribute("stroke-width", "4");
+      label.textContent = isStart ? "Bạn ở đây" : n.name;
+      svgEl.appendChild(label);
+    }
   });
 }
 

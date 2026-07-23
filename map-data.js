@@ -2,12 +2,15 @@
  * DỮ LIỆU SƠ ĐỒ - BỆNH VIỆN TRUNG ƯƠNG QUÂN ĐỘI 108
  * Số 01 Trần Hưng Đạo, phường Hai Bà Trưng, Hà Nội
  * --------------------------------------------------------
- * QUAN TRỌNG: toạ độ x,y bên dưới là ƯỚC LƯỢNG từ ảnh sơ đồ tổng thể,
- * CHƯA phải số đo chính xác. Trước khi triển khai thật, nên:
- *   1. Lấy file CAD/bản vẽ mặt bằng gốc (nếu có) để đo toạ độ chuẩn hơn, HOẶC
- *   2. Đi thực địa, đo khoảng cách/góc giữa các khu nhà rồi quy đổi sang x,y.
- * Việc này chỉ ảnh hưởng đến ĐỘ CHÍNH XÁC của hình vẽ & lời chỉ dẫn rẽ trái/phải,
- * không ảnh hưởng đến việc tìm đúng khu nhà/khoa cần đến.
+ * Toạ độ x,y bên dưới được đo trên ảnh nền thật: assets/hospital-floorplan.jpg
+ * (kích thước ảnh: 1000 x 1298 px). SVG sẽ vẽ đè lên đúng ảnh này bằng cách
+ * dùng viewBox trùng kích thước ảnh, nên KHÔNG được đổi kích thước ảnh mà
+ * không cập nhật lại MAP_IMAGE bên dưới.
+ *
+ * Toạ độ vẫn là ước lượng bằng mắt theo vị trí số hiệu (01-16) trên ảnh gốc.
+ * Nếu cần chính xác hơn: mở file assets/hospital-floorplan.jpg bằng phần mềm
+ * xem ảnh có thước đo pixel (hoặc Photoshop/GIMP), rê chuột vào đúng tâm mỗi
+ * khu nhà để đọc toạ độ pixel thật, rồi sửa lại x,y tương ứng.
  *
  * Node = một điểm mốc (cổng, hoặc khu nhà) -> cũng là nội dung mã QR dán tại đó.
  * Edge = một đoạn lối đi nối 2 mốc (không cần vẽ chi tiết từng ngã rẽ nhỏ).
@@ -15,31 +18,38 @@
  * trừ khi bạn tự khai báo weight cụ thể để ép theo khoảng cách đo thực tế.
  */
 
+// Ảnh nền mặt bằng thật + kích thước gốc (dùng làm viewBox cho SVG đè lên trên)
+const MAP_IMAGE = {
+  src: "assets/hospital-floorplan.jpg",
+  width: 1000,
+  height: 1298,
+};
+
 const HOSPITAL_MAP = {
   nodes: [
     // ----- CỔNG RA VÀO (mốc quét QR khi vừa vào viện) -----
-    { id: "G_1A", name: "Cổng 1A",         x: 312, y: 136, floor: 1, isGate: true },
-    { id: "G_1B", name: "Cổng 1B",         x: 222, y: 144, floor: 1, isGate: true },
-    { id: "G_CC", name: "Cổng Cấp cứu",    x: 60,  y: 296, floor: 1, isGate: true },
-    { id: "G_5",  name: "Cổng số 5",       x: 72,  y: 632, floor: 1, isGate: true },
+    { id: "G_1A", name: "Cổng 1A",         x: 520, y: 221, floor: 1, isGate: true },
+    { id: "G_1B", name: "Cổng 1B",         x: 370, y: 234, floor: 1, isGate: true },
+    { id: "G_CC", name: "Cổng Cấp cứu",    x: 100, y: 480, floor: 1, isGate: true },
+    { id: "G_5",  name: "Cổng số 5",       x: 120, y: 1025, floor: 1, isGate: true },
 
-    // ----- 16 KHU NHÀ (toạ độ ước lượng theo sơ đồ) -----
-    { id: "B01", name: "Nhà N1A",                              x: 180, y: 248, floor: 1, isDestination: true },
-    { id: "B02", name: "Nhà N1B",                              x: 252, y: 248, floor: 1, isDestination: true },
-    { id: "B03", name: "Nhà N2A",                              x: 216, y: 272, floor: 1, isDestination: true },
-    { id: "B04", name: "Nhà N2B",                              x: 252, y: 280, floor: 1, isDestination: true },
-    { id: "B05", name: "Trung tâm máy gia tốc",                x: 168, y: 280, floor: 1, isDestination: true },
-    { id: "B06", name: "Nhà N3",                                x: 288, y: 312, floor: 1, isDestination: true },
-    { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 342, y: 256, floor: 1, isDestination: true },
-    { id: "B08", name: "Tòa Tháp đôi",                          x: 132, y: 416, floor: 1, isDestination: true },
-    { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 288, y: 400, floor: 1, isDestination: true },
-    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 294, y: 464, floor: 1, isDestination: true },
-    { id: "B11", name: "Viện Lâm sàng các bệnh truyền nhiễm",  x: 174, y: 536, floor: 1, isDestination: true },
-    { id: "B12", name: "Nhà để xe nhân viên",                   x: 96,  y: 600, floor: 1, isDestination: true },
-    { id: "B13", name: "Nhà lưu trữ",                           x: 96,  y: 520, floor: 1, isDestination: true },
-    { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 366, y: 408, floor: 1, isDestination: true },
-    { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 366, y: 456, floor: 1, isDestination: true },
-    { id: "B16", name: "Nhà tang lễ",                           x: 252, y: 704, floor: 1, isDestination: true },
+    // ----- 16 KHU NHÀ (toạ độ đo theo ảnh 1000x1298) -----
+    { id: "B01", name: "Nhà N1A",                              x: 300, y: 402,  floor: 1, isDestination: true },
+    { id: "B02", name: "Nhà N1B",                              x: 420, y: 402,  floor: 1, isDestination: true },
+    { id: "B03", name: "Nhà N2A",                              x: 360, y: 441,  floor: 1, isDestination: true },
+    { id: "B04", name: "Nhà N2B",                              x: 420, y: 454,  floor: 1, isDestination: true },
+    { id: "B05", name: "Trung tâm máy gia tốc",                x: 280, y: 454,  floor: 1, isDestination: true },
+    { id: "B06", name: "Nhà N3",                                x: 480, y: 506,  floor: 1, isDestination: true },
+    { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 570, y: 415,  floor: 1, isDestination: true },
+    { id: "B08", name: "Tòa Tháp đôi",                          x: 220, y: 675,  floor: 1, isDestination: true },
+    { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 480, y: 649,  floor: 1, isDestination: true },
+    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 490, y: 753,  floor: 1, isDestination: true },
+    { id: "B11", name: "Viện Lâm sàng các bệnh truyền nhiễm",  x: 290, y: 870,  floor: 1, isDestination: true },
+    { id: "B12", name: "Nhà để xe nhân viên",                   x: 160, y: 973,  floor: 1, isDestination: true },
+    { id: "B13", name: "Nhà lưu trữ",                           x: 160, y: 844,  floor: 1, isDestination: true },
+    { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 610, y: 662,  floor: 1, isDestination: true },
+    { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 610, y: 740,  floor: 1, isDestination: true },
+    { id: "B16", name: "Nhà tang lễ",                           x: 420, y: 1142, floor: 1, isDestination: true },
   ],
 
   // Lối đi giữa các mốc - dựa theo cách bố trí sân/đường nội bộ trong sơ đồ.

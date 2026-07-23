@@ -42,7 +42,10 @@
   <section id="screen-directions" class="screen hidden">
     <h2 id="directions-title"></h2>
     <div id="floor-tabs" class="floor-tabs"></div>
-    <svg id="map-svg" viewBox="0 0 520 480" class="map-svg"></svg>
+    <div class="map-container">
+      <img id="map-background" class="map-background" src="assets/hospital-floorplan.jpg" alt="Sơ đồ mặt bằng bệnh viện" />
+      <svg id="map-svg" class="map-svg-overlay" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
     <ol id="directions-list" class="directions-list"></ol>
     <div class="button-row">
       <button id="btn-back-to-destinations" class="btn-secondary">← Chọn đích khác</button>
