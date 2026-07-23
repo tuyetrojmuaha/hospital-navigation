@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tạo mã QR - Quản trị</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; padding: 16px; }
+    .qr-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; }
+    .qr-card canvas { margin: 0 auto; }
+    .qr-card .qr-name { font-weight: 700; margin-top: 8px; }
+    .qr-card .qr-id { color: #6b7280; font-size: 12px; }
+    @media print {
+      .no-print { display: none; }
+      .qr-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">🖨️ In mã QR dán tường (Quản trị)</header>
+  <p class="no-print" style="text-align:center; padding: 8px 16px;">
+    Mỗi thẻ dưới đây tương ứng với một vị trí trong <code>map-data.js</code>.
+    In trang này (Ctrl/Cmd + P) rồi cắt dán từng mã QR lên đúng vị trí ngoài thực tế.
+  </p>
+  <button class="no-print btn-secondary" style="display:block;margin:0 auto 16px;" onclick="window.print()">In tất cả mã QR</button>
+
+  <div id="qr-grid" class="qr-grid"></div>
+
+  <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="map-data.js"></script>
+  <script>
+    const grid = document.getElementById("qr-grid");
+    HOSPITAL_MAP.nodes.forEach((node) => {
+      const card = document.createElement("div");
+      card.className = "qr-card";
+      const canvasHolder = document.createElement("div");
+      card.appendChild(canvasHolder);
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "qr-name";
+      nameEl.textContent = node.name;
+      card.appendChild(nameEl);
+
+      const idEl = document.createElement("div");
+      idEl.className = "qr-id";
+      idEl.textContent = `Mã: ${node.id} · Tầng ${node.floor}`;
+      card.appendChild(idEl);
+
+      grid.appendChild(card);
+
+      // Nội dung mã QR chính là node.id (app sẽ đọc đúng chuỗi này)
+      new QRCode(canvasHolder, {
+        text: node.id,
+        width: 160,
+        height: 160,
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chỉ đường Bệnh viện</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">🏥 Chỉ đường trong Bệnh viện</header>
+
+  <!-- MÀN HÌNH 1: QUÉT MÃ QR -->
+  <section id="screen-scan" class="screen">
+    <h2>Quét mã QR dán trên tường</h2>
+    <div id="qr-reader"></div>
+    <p id="scan-error" class="error-text"></p>
+
+    <div class="manual-fallback">
+      <p>Không quét được mã? Chọn vị trí hiện tại thủ công:</p>
+      <select id="manual-location-select">
+        <option value="">-- Chọn vị trí --</option>
+      </select>
+      <button id="btn-manual-select" class="btn-secondary">Xác nhận vị trí</button>
+    </div>
+  </section>
+
+  <!-- MÀN HÌNH 2: CHỌN ĐÍCH ĐẾN -->
+  <section id="screen-destination" class="screen hidden">
+    <p id="current-location-label" class="current-location"></p>
+    <h2>Bạn muốn đến đâu?</h2>
+    <div id="destination-list" class="destination-list"></div>
+    <button id="btn-back-to-scan" class="btn-secondary">← Quét lại vị trí</button>
+  </section>
+
+  <!-- MÀN HÌNH 3: HIỂN THỊ CHỈ DẪN (BẢN ĐỒ + TEXT) -->
+  <section id="screen-directions" class="screen hidden">
+    <h2 id="directions-title"></h2>
+    <div id="floor-tabs" class="floor-tabs"></div>
+    <svg id="map-svg" viewBox="0 0 520 480" class="map-svg"></svg>
+    <ol id="directions-list" class="directions-list"></ol>
+    <div class="button-row">
+      <button id="btn-back-to-destinations" class="btn-secondary">← Chọn đích khác</button>
+    </div>
+  </section>
+
+  <!-- Thư viện quét QR qua camera -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="map-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
