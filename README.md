@@ -13,6 +13,17 @@
 - `admin.html` — trang tạo & in mã QR cho từng vị trí (dùng nội bộ, không cần deploy công khai).
 - `map-data.js` — **file duy nhất cần chỉnh sửa** khi muốn thêm/sửa sơ đồ bệnh viện thật.
 
+## Đã cập nhật theo sơ đồ thật (Bệnh viện TWQĐ 108)
+- 16 khu nhà (01-16) + 4 cổng (1A, 1B, Cấp cứu, số 5) đã được đưa vào `map-data.js`.
+- Mỗi khu nhà có `BUILDING_DIRECTORY` liệt kê khoa/phòng theo từng tầng, lấy từ đúng chú thích trong sơ đồ.
+- **Lưu ý quan trọng**: toạ độ x,y hiện là ƯỚC LƯỢNG bằng mắt từ ảnh sơ đồ tổng thể, không phải số đo thật.
+  Điều này chỉ ảnh hưởng độ chính xác của hình vẽ & lời nhắc rẽ trái/phải — KHÔNG ảnh hưởng việc app
+  tìm đúng khoa/phòng. Muốn chính xác hơn, nên: đo khoảng cách thật giữa các khu nhà (bằng bước chân,
+  Google Maps, hoặc file CAD gốc nếu có) rồi cập nhật lại x,y trong file.
+- Trọng số (khoảng cách) của mỗi lối đi (`edges`) giờ **tự động tính** theo toạ độ x,y — không cần khai
+  báo tay, trừ khi muốn ép theo số đo thực tế bằng cách thêm `weight: <số>` vào edge đó.
+- Màn hình chọn đích đã đổi thành **ô tìm kiếm khoa/phòng** (gõ "cấp cứu", "sản", "nhi"...) vì có hơn 30 khoa/phòng.
+
 ## Tuỳ chỉnh sơ đồ bệnh viện (map-data.js)
 - Mỗi phòng/ngã rẽ/thang máy là một `node` với toạ độ `x, y` (đo tương đối theo bản vẽ mặt bằng thật).
 - Mỗi hành lang nối 2 node là một `edge`.

@@ -4,11 +4,18 @@
 const nodeById = {};
 HOSPITAL_MAP.nodes.forEach((n) => (nodeById[n.id] = n));
 
+// Nếu edge không khai báo weight, tự tính bằng khoảng cách Euclid giữa 2 toạ độ x,y.
+// Nhờ vậy khi thêm mốc mới trong map-data.js, thường KHÔNG cần tự tay ước lượng weight.
+function euclideanDistance(a, b) {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+}
+
 const adjacency = {}; // adjacency[nodeId] = [{to, weight, isElevator, instruction}]
 HOSPITAL_MAP.nodes.forEach((n) => (adjacency[n.id] = []));
 HOSPITAL_MAP.edges.forEach((e) => {
-  adjacency[e.from].push({ to: e.to, weight: e.weight, isElevator: !!e.isElevator, instruction: e.instruction });
-  adjacency[e.to].push({ to: e.from, weight: e.weight, isElevator: !!e.isElevator, instruction: e.instruction });
+  const w = e.weight != null ? e.weight : euclideanDistance(nodeById[e.from], nodeById[e.to]);
+  adjacency[e.from].push({ to: e.to, weight: w, isElevator: !!e.isElevator, instruction: e.instruction });
+  adjacency[e.to].push({ to: e.from, weight: w, isElevator: !!e.isElevator, instruction: e.instruction });
 });
 
 // ============================================================
@@ -75,12 +82,12 @@ function turnLabel(prevBearing, nextBearing) {
   return "quay lại";
 }
 
-function generateDirections(pathResult) {
+function generateDirections(pathResult, destination) {
   const { steps } = pathResult;
   const instructions = [];
   let prevBearing = null;
 
-  steps.forEach((step, idx) => {
+  steps.forEach((step) => {
     const fromNode = nodeById[step.from];
     const toNode = nodeById[step.to];
 
@@ -104,7 +111,15 @@ function generateDirections(pathResult) {
     prevBearing = curBearing;
   });
 
-  instructions.push({ text: `Bạn đã đến: ${nodeById[steps[steps.length - 1].to].name}`, icon: "🏁" });
+  // Bước cuối: nếu khoa/phòng nằm ở tầng cụ thể trong toà nhà, nhắc lên tầng đó.
+  if (destination.floor) {
+    instructions.push({
+      text: `Vào ${destination.buildingName}, lên Tầng ${destination.floor} để đến: ${destination.desc}`,
+      icon: "🛗",
+    });
+  } else {
+    instructions.push({ text: `Bạn đã đến: ${destination.desc}`, icon: "🏁" });
+  }
   return instructions;
 }
 
@@ -181,41 +196,61 @@ function showScreen(name) {
   screens[name].classList.remove("hidden");
 }
 
-function populateDestinationList() {
+// Gộp BUILDING_DIRECTORY thành 1 danh sách phẳng, dễ tìm kiếm theo tên khoa/phòng
+// hoặc theo tên khu nhà (vd: gõ "cấp cứu" hoặc gõ "N1A" đều ra kết quả).
+const DESTINATIONS = [];
+Object.keys(BUILDING_DIRECTORY).forEach((buildingId) => {
+  const building = nodeById[buildingId];
+  BUILDING_DIRECTORY[buildingId].forEach((entry) => {
+    DESTINATIONS.push({
+      buildingId,
+      buildingName: building.name,
+      floor: entry.floor,
+      desc: entry.desc,
+    });
+  });
+});
+
+function renderDestinationButtons(items) {
   const list = document.getElementById("destination-list");
   list.innerHTML = "";
-  const byFloor = {};
-  HOSPITAL_MAP.nodes
-    .filter((n) => n.isDestination)
-    .forEach((n) => {
-      byFloor[n.floor] = byFloor[n.floor] || [];
-      byFloor[n.floor].push(n);
-    });
-
-  Object.keys(byFloor).sort().forEach((floor) => {
-    const heading = document.createElement("div");
-    heading.className = "floor-heading";
-    heading.textContent = `Tầng ${floor}`;
-    list.appendChild(heading);
-
-    byFloor[floor].forEach((n) => {
-      const btn = document.createElement("button");
-      btn.className = "dest-btn";
-      btn.textContent = n.name;
-      btn.onclick = () => selectDestination(n.id);
-      list.appendChild(btn);
-    });
+  if (items.length === 0) {
+    list.innerHTML = '<p class="no-result">Không tìm thấy khoa/phòng phù hợp. Hãy hỏi nhân viên hỗ trợ gần nhất.</p>';
+    return;
+  }
+  items.forEach((d) => {
+    const btn = document.createElement("button");
+    btn.className = "dest-btn";
+    const sameName = d.desc === d.buildingName;
+    btn.innerHTML = sameName
+      ? `<span class="dest-desc">${d.desc}</span>`
+      : `<span class="dest-desc">${d.desc}</span><span class="dest-building">${d.buildingName}${d.floor ? " · Tầng " + d.floor : ""}</span>`;
+    btn.onclick = () => selectDestination(d);
+    list.appendChild(btn);
   });
 }
 
-function selectDestination(destId) {
-  state.destinationId = destId;
-  const result = findShortestPath(state.currentNodeId, destId);
+function populateDestinationList() {
+  renderDestinationButtons(DESTINATIONS);
+  const searchInput = document.getElementById("destination-search");
+  searchInput.value = "";
+  searchInput.oninput = () => {
+    const q = searchInput.value.trim().toLowerCase();
+    const filtered = DESTINATIONS.filter(
+      (d) => d.desc.toLowerCase().includes(q) || d.buildingName.toLowerCase().includes(q)
+    );
+    renderDestinationButtons(filtered);
+  };
+}
+
+function selectDestination(destination) {
+  state.destinationId = destination.buildingId;
+  const result = findShortestPath(state.currentNodeId, destination.buildingId);
   if (!result) {
     alert("Không tìm được đường đi đến địa điểm này. Vui lòng liên hệ nhân viên hỗ trợ.");
     return;
   }
-  const directions = generateDirections(result);
+  const directions = generateDirections(result, destination);
   const list = document.getElementById("directions-list");
   list.innerHTML = "";
   directions.forEach((step) => {
@@ -224,10 +259,8 @@ function selectDestination(destId) {
     list.appendChild(li);
   });
 
-  document.getElementById("directions-title").textContent =
-    `Đường đến: ${nodeById[destId].name}`;
+  document.getElementById("directions-title").textContent = `Đường đến: ${destination.desc}`;
 
-  // xác định tầng để vẽ: nếu lộ trình đổi tầng, ưu tiên hiển thị tầng đích trước, cho phép chuyển
   const floorsInPath = new Set(result.steps.flatMap((s) => [nodeById[s.from].floor, nodeById[s.to].floor]));
   renderFloorTabs(Array.from(floorsInPath).sort(), result);
   showScreen("directions");
@@ -314,11 +347,11 @@ window.addEventListener("DOMContentLoaded", () => {
   // đổ danh sách vào combo "chọn thủ công" (dự phòng)
   const select = document.getElementById("manual-location-select");
   HOSPITAL_MAP.nodes
-    .filter((n) => n.isDestination)
+    .filter((n) => n.isDestination || n.isGate)
     .forEach((n) => {
       const opt = document.createElement("option");
       opt.value = n.id;
-      opt.textContent = `${n.name} (Tầng ${n.floor})`;
+      opt.textContent = n.isGate ? `${n.name} (cổng)` : n.name;
       select.appendChild(opt);
     });
 

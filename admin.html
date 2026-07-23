@@ -44,7 +44,7 @@
 
       const idEl = document.createElement("div");
       idEl.className = "qr-id";
-      idEl.textContent = `Mã: ${node.id} · Tầng ${node.floor}`;
+      idEl.textContent = node.isGate ? `Mã: ${node.id} · Cổng` : `Mã: ${node.id} · Khu nhà`;
       card.appendChild(idEl);
 
       grid.appendChild(card);
