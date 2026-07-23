@@ -21,9 +21,10 @@ cho phép chọn vị trí thủ công từ danh sách.
 - `map-image.js` — ảnh nền sơ đồ mặt bằng thật, đã nhúng sẵn dạng base64 (không phải file ảnh rời).
 
 ## Mã QR chứa link, không phải mã trần
-- Mở `admin.html` trên máy tính → mỗi thẻ hiển thị 1 mã QR cho 1 khu nhà/cổng, cùng ô để chỉnh
-  "Địa chỉ trang index.html sau khi deploy" (tự đoán theo domain hiện tại, kiểm tra lại cho đúng
-  trước khi in QR hàng loạt).
+- Mở `admin.html` trên máy tính → mỗi thẻ hiển thị 1 mã QR cho 1 khu nhà/cổng. Ô "Địa chỉ trang
+  index.html sau khi deploy" đã đặt sẵn giá trị `https://tuyetrojmuaha.github.io/hospital-navigation/index.html`
+  — nếu đổi domain/tên repo sau này, sửa lại dòng `guessedBaseUrl` trong `admin.html` (hoặc gõ đè trực
+  tiếp vào ô đó trước khi in).
 - Nhấn "In tất cả mã QR", cắt và dán đúng vị trí thực tế tương ứng.
 
 ## Ảnh nền sơ đồ mặt bằng thật (đã nhúng sẵn, không cần upload file riêng)

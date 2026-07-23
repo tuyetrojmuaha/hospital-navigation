@@ -38,8 +38,8 @@
   <script src="map-image.js"></script>
   <script src="map-data.js"></script>
   <script>
-    // Tự đoán URL của index.html dựa theo vị trí file admin.html đang chạy (cùng thư mục).
-    const guessedBaseUrl = new URL("index.html", window.location.href).href;
+    // Địa chỉ trang thật sau khi deploy lên GitHub Pages. Sửa lại đây nếu domain đổi.
+    const guessedBaseUrl = "https://tuyetrojmuaha.github.io/hospital-navigation/index.html";
     document.getElementById("base-url-input").value = guessedBaseUrl;
 
     const grid = document.getElementById("qr-grid");
