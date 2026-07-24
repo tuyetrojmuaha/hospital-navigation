@@ -57,18 +57,21 @@ cho phép chọn vị trí thủ công từ danh sách.
   ```
   Rồi cập nhật `MAP_IMAGE.width` / `MAP_IMAGE.height` trong `map-data.js` cho khớp kích thước ảnh mới.
 
-## Đường đi bám theo lối đi thực tế, không cắt xuyên qua nhà
-- `map-data.js` giờ có thêm các **waypoint** (`isWaypoint: true`, tên bắt đầu bằng `P_...`) — đây là các
-  điểm gãy đặt dọc theo khoảng sân/đường trống thực tế trên sơ đồ (không phải nơi đến, không hiện trong
-  danh sách tìm kiếm, không có mã QR).
-- Mỗi khu nhà/cổng chỉ nối tới **waypoint gần nhất**, không còn nối thẳng khu nhà này sang khu nhà kia.
-  Nhờ vậy khi tính đường đi ngắn nhất, lộ trình sẽ đi vòng theo đúng lối đi (qua các waypoint) thay vì
-  vẽ đường thẳng cắt xuyên qua các toà nhà khác.
-- Vị trí các waypoint hiện là ước lượng theo khoảng trắng (sân/đường) nhìn thấy trên ảnh sơ đồ. Muốn
-  chính xác hơn: mở `map-image.js` (giải mã base64 ra ảnh, hoặc dùng lại ảnh gốc) để xem đúng ranh giới
-  sân/đường, rồi thêm/bớt/di chuyển waypoint và các edge nối tới cho khớp với lối đi thật ngoài hiện trường.
-- Muốn thêm 1 lối đi mới: thêm 1 node có `isWaypoint: true`, rồi thêm edge nối nó với waypoint lân cận
-  và/hoặc khu nhà cần nối — không cần khai báo `weight` vì hệ thống tự tính theo khoảng cách toạ độ.
+## Đường đi bám theo đúng các mũi tên đỏ (lối đi được phép qua) trên sơ đồ gốc
+- Trên ảnh sơ đồ gốc có các hàng mũi tên đỏ nhỏ, ngược chiều nhau (↕) — đây là ký hiệu chính thức
+  đánh dấu chỗ được phép đi bộ băng qua giữa các khu nhà/bãi xe/sân vườn.
+- `map-data.js` giờ có 18 **waypoint** (`isWaypoint: true`, id bắt đầu `P_...`) đặt **đúng tại các
+  hàng mũi tên này** (xác định bằng cách dò màu đỏ trên ảnh gốc độ phân giải cao rồi quy đổi toạ độ
+  về hệ 1000×1298) — không phải ước lượng bằng mắt như bản trước.
+- Mỗi khu nhà/cổng chỉ nối tới waypoint/điểm băng qua gần nhất, nên lộ trình luôn đi qua đúng các lối
+  đi được đánh dấu, không cắt xuyên qua nhà khác.
+- Waypoint không hiện trong danh sách tìm kiếm, không có mã QR — chỉ dùng để dẫn đường.
+- Vẫn có thể còn sai lệch nhỏ ở vài điểm ít mũi tên rõ (đã dùng ước lượng vị trí trung tâm hợp lý cho
+  các đoạn đó). Muốn tinh chỉnh thêm: mở ảnh gốc phóng to, đối chiếu từng hàng mũi tên, sửa lại x,y
+  của waypoint tương ứng trong `map-data.js`.
+- Muốn thêm 1 lối đi mới: thêm 1 node có `isWaypoint: true` tại đúng vị trí mũi tên, rồi thêm edge nối
+  nó với waypoint lân cận và/hoặc khu nhà cần nối — không cần khai báo `weight` vì hệ thống tự tính
+  theo khoảng cách toạ độ.
 
 ## Tuỳ chỉnh sơ đồ bệnh viện (map-data.js)
 - Mỗi khu nhà/cổng là một `node` với toạ độ `x, y` đo theo đúng ảnh nền (`map-image.js`).
