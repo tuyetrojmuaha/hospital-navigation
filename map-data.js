@@ -51,16 +51,13 @@ const HOSPITAL_MAP = {
     // ----- 16 KHU NHÀ (toạ độ đo theo ảnh 1000x1298) -----
     // Toạ độ đã dịch nhẹ (~16px) về phía lối đi/waypoint kết nối gần nhất, để gần với
     // "cửa vào" hơn là tâm hình khối của toà nhà (xem ghi chú CỬA VÀO ở đầu file).
-    { id: "B01_1", name: "Khu đăng ký khám Nhà N1A ", x: 292, y: 387,  floor: 1, isDestination: true },
-    { id: "B01_2", name: "Khu hướng dẫn Nhà N1A ", x: 326, y: 400,  floor: 1, isDestination: true },
-    { id: "B01_3", name: "Nhà thuốc số 2 Nhà N1A ", x: 257, y: 399,  floor: 1, isDestination: true },
-    { id: "B01_3", name: "Các phòng khám từ 1-20 Nhà N1A ", x: 257, y: 399,  floor: 2, isDestination: true },
+    { id: "B01", name: "Nhà N1A",                              x: 296, y: 386,  floor: 1, isDestination: true },
     { id: "B02", name: "Nhà N1B",                              x: 422, y: 386,  floor: 1, isDestination: true },
     { id: "B03", name: "Nhà N2A",                              x: 374, y: 448,  floor: 1, isDestination: true },
     { id: "B04", name: "Nhà N2B",                              x: 405, y: 459,  floor: 1, isDestination: true },
     { id: "B05", name: "Trung tâm máy gia tốc",                x: 273, y: 468,  floor: 1, isDestination: true },
     { id: "B06", name: "Nhà N3",                                x: 472, y: 520,  floor: 1, isDestination: true },
-    { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 596, y: 414,  floor: 1, isDestination: true },
+    { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 567, y: 431,  floor: 1, isDestination: true },
     { id: "B08", name: "Tòa Tháp đôi",                          x: 220, y: 675,  floor: 1, isDestination: true },
     { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 466, y: 642,  floor: 1, isDestination: true },
     { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 475, y: 757,  floor: 1, isDestination: true },
@@ -70,7 +67,6 @@ const HOSPITAL_MAP = {
     { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 595, y: 656,  floor: 1, isDestination: true },
     { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 595, y: 745,  floor: 1, isDestination: true },
     { id: "B16", name: "Nhà tang lễ",                           x: 417, y: 1126, floor: 1, isDestination: true },
-    { id: "BDXM", name: "Nhà để xe máy khách",                  x: 319, y: 310, floor: 1, isDestination: true },
 
     // ----- HANH LANG NOI THAT B01 (Nhà N1A) - lap lai o ca 4 tang -----
     { id: "B01_F1_1", name: "Hành lang Tầng 1", x: 256, y: 400, floor: 1, isWaypoint: true },
