@@ -57,21 +57,37 @@ cho phép chọn vị trí thủ công từ danh sách.
   ```
   Rồi cập nhật `MAP_IMAGE.width` / `MAP_IMAGE.height` trong `map-data.js` cho khớp kích thước ảnh mới.
 
-## Đường đi bám theo đúng các mũi tên đỏ (lối đi được phép qua) trên sơ đồ gốc
-- Trên ảnh sơ đồ gốc có các hàng mũi tên đỏ nhỏ, ngược chiều nhau (↕) — đây là ký hiệu chính thức
-  đánh dấu chỗ được phép đi bộ băng qua giữa các khu nhà/bãi xe/sân vườn.
-- `map-data.js` giờ có 18 **waypoint** (`isWaypoint: true`, id bắt đầu `P_...`) đặt **đúng tại các
-  hàng mũi tên này** (xác định bằng cách dò màu đỏ trên ảnh gốc độ phân giải cao rồi quy đổi toạ độ
-  về hệ 1000×1298) — không phải ước lượng bằng mắt như bản trước.
-- Mỗi khu nhà/cổng chỉ nối tới waypoint/điểm băng qua gần nhất, nên lộ trình luôn đi qua đúng các lối
-  đi được đánh dấu, không cắt xuyên qua nhà khác.
-- Waypoint không hiện trong danh sách tìm kiếm, không có mã QR — chỉ dùng để dẫn đường.
-- Vẫn có thể còn sai lệch nhỏ ở vài điểm ít mũi tên rõ (đã dùng ước lượng vị trí trung tâm hợp lý cho
-  các đoạn đó). Muốn tinh chỉnh thêm: mở ảnh gốc phóng to, đối chiếu từng hàng mũi tên, sửa lại x,y
-  của waypoint tương ứng trong `map-data.js`.
-- Muốn thêm 1 lối đi mới: thêm 1 node có `isWaypoint: true` tại đúng vị trí mũi tên, rồi thêm edge nối
-  nó với waypoint lân cận và/hoặc khu nhà cần nối — không cần khai báo `weight` vì hệ thống tự tính
-  theo khoảng cách toạ độ.
+## Đường đi bám theo đúng các chấm đỏ do bạn tự đánh dấu trên ảnh
+- Thay vì tự ước lượng, giờ dùng đúng **174 điểm lối đi mặt bằng** (`isWaypoint: true`, id `P_G1..P_G174`)
+  lấy từ ảnh sơ đồ mà bạn tự chấm tay (chấm đỏ = lối đi, chấm xanh = đích đến).
+- Cách xử lý: so khác biệt pixel giữa ảnh gốc và ảnh đã chấm để tìm đúng vị trí từng chấm (loại bỏ hết
+  mũi tên/chữ đỏ có sẵn trên sơ đồ gốc), phân loại chấm nằm trên nền trắng/khe trống (lối đi mặt bằng)
+  và chấm đè lên ảnh toà nhà, rồi tự động nối các điểm gần nhau (bán kính 30px) thành 1 mạng lưới.
+- Mỗi khu nhà/cổng được nối tới điểm mặt bằng **gần nhất** trong mạng lưới này — đã kiểm tra toàn bộ
+  198 node đều nằm trong **1 thành phần liên thông duy nhất** (không còn khu nào bị "mắc kẹt" không tìm
+  được đường).
+- Vì mạng lưới rất chi tiết (nhiều điểm sát nhau), lời chỉ dẫn tự động **gộp các đoạn đi thẳng liên tiếp**
+  lại thành 1 dòng, chỉ tách dòng mới khi thực sự rẽ/đổi tầng/tới đích — nếu vẫn thấy chỉ dẫn hơi dài ở
+  vài lộ trình, có thể nới thêm ngưỡng góc "đi thẳng" trong hàm `turnLabel()` (`app.js`, hiện là 40°).
+- **41 chấm đỏ nằm đè lên ảnh toà nhà** (theo bạn mô tả là lối đi cho các tầng khác nhau) chưa được đưa
+  vào vì không có cách phân biệt chấm nào ứng với tầng nào (cùng 1 màu đỏ). Muốn dùng được, cần thêm 1
+  trong 2 cách: (1) báo lại thứ tự/tầng tương ứng của từng chấm, hoặc (2) lần sau đánh dấu mỗi tầng bằng
+  1 màu riêng để tự động phân biệt.
+- **29 chấm xanh (đích đến)** đã dò được toạ độ nhưng cũng chưa đưa vào `BUILDING_DIRECTORY` vì chưa rõ
+  tên khoa/phòng ứng với từng chấm — cần bạn xác nhận/đặt tên rồi gửi lại để em thêm vào.
+
+## Cửa vào của khu nhà (isEntrance) + giới hạn lối đi TRONG NHÀ
+- **Toà Tháp đôi (B08)** là khu nhà duy nhất trong sơ đồ ghi rõ nhiều cửa vào riêng (Sảnh A, Sảnh B,
+  Sảnh C + 1 lối Cấp cứu riêng). Mỗi cửa giờ là 1 node `isEntrance: true` nối vào node ảo `B08`
+  (dùng để tìm kiếm/hiện tên) — Dijkstra sẽ **tự chọn cửa gần nhất** theo hướng người dùng đang đứng,
+  và câu chỉ dẫn cuối sẽ nêu đúng tên cửa ("Vào toà nhà qua Sảnh A", hoặc "Vào thẳng khu Cấp cứu").
+- Các khu nhà còn lại (01-07, 09-16): sơ đồ tổng thể không ghi rõ cửa chính ở đâu, nên mỗi khu nhà được
+  nối tới điểm mặt bằng gần nhất trong 174 điểm mới. Nếu biết chính xác cửa chính từng nhà nằm ở đâu,
+  nên tách chúng thành `isEntrance` giống B08 (đặc biệt các nhà có 2 mặt tiền/nhiều lối vào) — xem hướng
+  dẫn chi tiết trong `CONFIG-GUIDE.md`.
+- **Lối đi TRONG NHÀ (hành lang, cầu thang, phòng cụ thể) hiện CHƯA làm được**, vì sơ đồ gốc `T1.pdf`
+  chỉ là bản vẽ mặt bằng tổng thể + bảng liệt kê khoa/tầng bằng chữ, không có bản vẽ nội thất từng
+  tầng. Chỉ dẫn hiện dừng ở mức "vào toà nhà qua cửa nào, lên tầng mấy".
 
 ## Tuỳ chỉnh sơ đồ bệnh viện (map-data.js)
 - Mỗi khu nhà/cổng là một `node` với toạ độ `x, y` đo theo đúng ảnh nền (`map-image.js`).

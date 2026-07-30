@@ -10,12 +10,12 @@ function euclideanDistance(a, b) {
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
 
-const adjacency = {}; // adjacency[nodeId] = [{to, weight, isElevator, instruction}]
+const adjacency = {}; // adjacency[nodeId] = [{to, weight, isElevator, instruction, icon}]
 HOSPITAL_MAP.nodes.forEach((n) => (adjacency[n.id] = []));
 HOSPITAL_MAP.edges.forEach((e) => {
   const w = e.weight != null ? e.weight : euclideanDistance(nodeById[e.from], nodeById[e.to]);
-  adjacency[e.from].push({ to: e.to, weight: w, isElevator: !!e.isElevator, instruction: e.instruction });
-  adjacency[e.to].push({ to: e.from, weight: w, isElevator: !!e.isElevator, instruction: e.instruction });
+  adjacency[e.from].push({ to: e.to, weight: w, isElevator: !!e.isElevator, instruction: e.instruction, icon: e.icon });
+  adjacency[e.to].push({ to: e.from, weight: w, isElevator: !!e.isElevator, instruction: e.instruction, icon: e.icon });
 });
 
 // ============================================================
@@ -76,16 +76,41 @@ function turnLabel(prevBearing, nextBearing) {
   let diff = ((nextBearing - prevBearing) * 180) / Math.PI;
   while (diff > 180) diff -= 360;
   while (diff < -180) diff += 360;
-  if (Math.abs(diff) < 25) return "đi thẳng";
-  if (diff >= 25 && diff < 150) return "rẽ trái";
-  if (diff <= -25 && diff > -150) return "rẽ phải";
+  // Ngưỡng 40° (thay vì 25°) vì lưới lối đi dò từ chấm tay vẽ có độ lệch nhỏ tự nhiên giữa
+  // các điểm liên tiếp — ngưỡng rộng hơn giúp không báo "rẽ" vặt ở những đoạn thực chất vẫn thẳng.
+  if (Math.abs(diff) < 40) return "đi thẳng";
+  if (diff >= 40 && diff < 150) return "rẽ trái";
+  if (diff <= -40 && diff > -150) return "rẽ phải";
   return "quay lại";
 }
 
 function generateDirections(pathResult, destination) {
   const { steps } = pathResult;
   const instructions = [];
-  let prevBearing = null;
+
+  // Vì lưới lối đi có rất nhiều điểm sát nhau (dò từ ảnh thật), một đoạn "đi thẳng" thực tế
+  // có thể gồm hàng chục điểm nhỏ liên tiếp. Để lời chỉ dẫn không bị vụn thành hàng chục dòng
+  // "đi thẳng" lặp lại, ta GOM các bước thẳng hàng liên tiếp lại thành 1 dòng duy nhất, và chỉ
+  // tách dòng mới khi thực sự có rẽ / đổi tầng / lời chỉ dẫn cố định / tới đích.
+  let buffer = null; // { targetLabel, stepCount }
+  let runStartBearing = null;
+
+  function startBuffer() {
+    buffer = { targetLabel: null, stepCount: 0 };
+  }
+  function updateBuffer(label) {
+    buffer.stepCount += 1;
+    if (label) buffer.targetLabel = label;
+  }
+  function flushBuffer() {
+    if (buffer && buffer.stepCount > 0) {
+      instructions.push({
+        text: buffer.targetLabel ? `Đi thẳng, hướng tới ${buffer.targetLabel}` : "Đi thẳng theo lối đi",
+        icon: "⬆️",
+      });
+    }
+    buffer = null;
+  }
 
   steps.forEach((step, idx) => {
     const fromNode = nodeById[step.from];
@@ -94,32 +119,45 @@ function generateDirections(pathResult, destination) {
     // Chỉ nêu tên đích thật (khu nhà/cổng) trong câu chỉ dẫn, không nêu tên waypoint kỹ thuật
     const targetLabel = toNode.isWaypoint ? null : toNode.name;
 
-    if (step.edge.isElevator) {
+    // Một số đoạn có lời chỉ dẫn CỐ ĐỊNH riêng (thang máy, cửa vào cụ thể...) — dùng luôn
+    // thay vì tự tính rẽ trái/phải, vì bản thân đoạn đó đã mang ý nghĩa rõ ràng hơn.
+    if (step.edge.instruction || step.edge.isElevator) {
+      flushBuffer();
       instructions.push({
         text: step.edge.instruction || `Di chuyển từ Tầng ${fromNode.floor} lên Tầng ${toNode.floor}`,
-        icon: "🛗",
+        icon: step.edge.icon || (step.edge.isElevator ? "🛗" : "➡️"),
       });
-      prevBearing = null; // reset hướng sau khi đổi tầng
+      runStartBearing = null;
+      startBuffer();
       return;
     }
 
     const curBearing = bearing(fromNode, toNode);
-    if (prevBearing === null) {
-      instructions.push({
-        text: targetLabel ? `Đi thẳng về hướng ${targetLabel}` : "Đi thẳng theo lối đi",
-        icon: "⬆️",
-      });
+    if (runStartBearing === null) {
+      // bắt đầu 1 đoạn thẳng mới (đầu lộ trình, hoặc ngay sau 1 lần rẽ/thang máy)
+      startBuffer();
+      updateBuffer(targetLabel);
+      runStartBearing = curBearing;
     } else {
-      const turn = turnLabel(prevBearing, curBearing);
-      const icon = turn === "rẽ trái" ? "⬅️" : turn === "rẽ phải" ? "➡️" : turn === "quay lại" ? "🔄" : "⬆️";
-      const turnText = turn.charAt(0).toUpperCase() + turn.slice(1);
-      instructions.push({
-        text: targetLabel && !isLastStep ? `${turnText}, hướng tới ${targetLabel}` : turnText,
-        icon,
-      });
+      // so sánh với hướng lúc BẮT ĐẦU đoạn thẳng hiện tại (không phải bước ngay trước đó),
+      // để phát hiện đúng cả những khúc cua rất thoải trải dài qua nhiều điểm nhỏ
+      const turn = turnLabel(runStartBearing, curBearing);
+      if (turn === "đi thẳng") {
+        updateBuffer(targetLabel);
+      } else {
+        flushBuffer();
+        const icon = turn === "rẽ trái" ? "⬅️" : turn === "rẽ phải" ? "➡️" : turn === "quay lại" ? "🔄" : "⬆️";
+        const turnText = turn.charAt(0).toUpperCase() + turn.slice(1);
+        instructions.push({
+          text: targetLabel && !isLastStep ? `${turnText}, hướng tới ${targetLabel}` : turnText,
+          icon,
+        });
+        runStartBearing = curBearing;
+        startBuffer();
+      }
     }
-    prevBearing = curBearing;
   });
+  flushBuffer();
 
   // Bước cuối: nếu khoa/phòng nằm ở tầng cụ thể trong toà nhà, nhắc lên tầng đó.
   if (destination.floor) {
