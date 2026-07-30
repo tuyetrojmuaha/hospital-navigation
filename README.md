@@ -57,6 +57,25 @@ cho phép chọn vị trí thủ công từ danh sách.
   ```
   Rồi cập nhật `MAP_IMAGE.width` / `MAP_IMAGE.height` trong `map-data.js` cho khớp kích thước ảnh mới.
 
+## Dẫn đường LÊN TỪNG TẦNG THẬT cho 4 khu nhà có nhiều tầng (N1A, N1B, N2A, N3)
+- 4 khu nhà này (B01, B02, B03, B06) mỗi nhà có 4 tầng với công năng khác nhau. Dựa theo các chấm đỏ
+  bạn đánh dấu đè lên ảnh 4 toà nhà này (hàng/cột chấm = hành lang), hệ thống giờ dựng:
+  - 1 "hành lang" gồm nhiều điểm nối tiếp nhau cho mỗi tầng (lặp lại cùng 1 cấu trúc ở cả 4 tầng,
+    đúng như hành lang thật thường giống nhau giữa các tầng).
+  - Nối các tầng với nhau bằng cạnh `isElevator: true` tại điểm cuối hành lang (đại diện vị trí
+    thang máy/cầu thang), có `instruction` riêng ví dụ "Đi thang máy/cầu thang lên Tầng 2 - Nhà N1A".
+  - Tầng 1 = chính node khu nhà đã có sẵn (không tạo thêm), Tầng 2-4 là node mới (id dạng
+    `B01_F2_5`, `B01_F3_5`...).
+- `BUILDING_DIRECTORY` mỗi mục tầng 2-4 của 4 nhà này giờ có thêm field `nodeId` trỏ đúng tới node
+  hành lang của tầng đó. Khi tìm kiếm ra 1 khoa/phòng ở tầng cụ thể, app sẽ tính đường **xuyên suốt
+  từ vị trí hiện tại → vào đúng cửa toà nhà → đi hết hành lang tầng 1 → lên thang máy → tới đúng tầng**,
+  thay vì chỉ tính đến cửa toà nhà rồi ghi chú thêm chữ như trước.
+- Test thử: từ Cổng 1B tới "Nhà N1A - Tầng 2" chỉ mất 12 bước, đi đúng qua hành lang tầng 1 rồi lên
+  thẳng tầng 2 — xem chi tiết cách test trong mục "Triển khai" bên dưới.
+- Muốn áp dụng cách này cho khu nhà khác: xem hướng dẫn chi tiết + ví dụ code trong `CONFIG-GUIDE.md`
+  (mục "Đi từ TẦNG này sang TẦNG kia"), giờ đã có ví dụ thật (B01/B02/B03/B06) để tham khảo trực tiếp
+  trong `map-data.js` thay vì chỉ đọc hướng dẫn suông.
+
 ## Đường đi bám theo đúng các chấm đỏ do bạn tự đánh dấu trên ảnh
 - Thay vì tự ước lượng, giờ dùng đúng **174 điểm lối đi mặt bằng** (`isWaypoint: true`, id `P_G1..P_G174`)
   lấy từ ảnh sơ đồ mà bạn tự chấm tay (chấm đỏ = lối đi, chấm xanh = đích đến).

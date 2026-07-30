@@ -159,8 +159,12 @@ function generateDirections(pathResult, destination) {
   });
   flushBuffer();
 
-  // Bước cuối: nếu khoa/phòng nằm ở tầng cụ thể trong toà nhà, nhắc lên tầng đó.
-  if (destination.floor) {
+  // Bước cuối: giờ việc "lên tầng mấy" đã là MỘT BƯỚC THẬT trong lộ trình (nếu đích có node
+  // hành lang riêng theo tầng, xem targetNodeId/nodeId trong BUILDING_DIRECTORY), nên ở đây
+  // chỉ cần báo đã tới đích. Với các khu nhà chưa có cấu trúc tầng chi tiết, vẫn nhắc thêm
+  // số tầng bằng chữ để không mất thông tin.
+  const hasFloorNode = destination.targetNodeId && destination.targetNodeId !== destination.buildingId;
+  if (destination.floor && !hasFloorNode) {
     instructions.push({
       text: `Vào ${destination.buildingName}, lên Tầng ${destination.floor} để đến: ${destination.desc}`,
       icon: "🛗",
@@ -267,6 +271,10 @@ Object.keys(BUILDING_DIRECTORY).forEach((buildingId) => {
   BUILDING_DIRECTORY[buildingId].forEach((entry) => {
     DESTINATIONS.push({
       buildingId,
+      // Nếu tầng này có node hành lang riêng (entry.nodeId, vd B01_F2_5), dùng đúng node đó
+      // để tính đường đi xuyên suốt cả vào toà nhà lẫn lên tầng. Không có thì dùng buildingId
+      // (áp dụng cho các khu nhà chỉ có 1 tầng/không rõ cấu trúc tầng).
+      targetNodeId: entry.nodeId || buildingId,
       buildingName: building.name,
       floor: entry.floor,
       desc: entry.desc,
@@ -307,8 +315,8 @@ function populateDestinationList() {
 }
 
 function selectDestination(destination) {
-  state.destinationId = destination.buildingId;
-  const result = findShortestPath(state.currentNodeId, destination.buildingId);
+  state.destinationId = destination.targetNodeId;
+  const result = findShortestPath(state.currentNodeId, destination.targetNodeId);
   if (!result) {
     alert("Không tìm được đường đi đến địa điểm này. Vui lòng liên hệ nhân viên hỗ trợ.");
     return;
