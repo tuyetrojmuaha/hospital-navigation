@@ -95,24 +95,20 @@ cho phép chọn vị trí thủ công từ danh sách.
   (mục "Đi từ TẦNG này sang TẦNG kia"), giờ đã có ví dụ thật (B01/B02/B03/B06) để tham khảo trực tiếp
   trong `map-data.js` thay vì chỉ đọc hướng dẫn suông.
 
-## Đường đi bám theo đúng các chấm đỏ do bạn tự đánh dấu trên ảnh
-- Thay vì tự ước lượng, giờ dùng đúng **174 điểm lối đi mặt bằng** (`isWaypoint: true`, id `P_G1..P_G174`)
-  lấy từ ảnh sơ đồ mà bạn tự chấm tay (chấm đỏ = lối đi, chấm xanh = đích đến).
-- Cách xử lý: so khác biệt pixel giữa ảnh gốc và ảnh đã chấm để tìm đúng vị trí từng chấm (loại bỏ hết
-  mũi tên/chữ đỏ có sẵn trên sơ đồ gốc), phân loại chấm nằm trên nền trắng/khe trống (lối đi mặt bằng)
-  và chấm đè lên ảnh toà nhà, rồi tự động nối các điểm gần nhau (bán kính 30px) thành 1 mạng lưới.
-- Mỗi khu nhà/cổng được nối tới điểm mặt bằng **gần nhất** trong mạng lưới này — đã kiểm tra toàn bộ
-  198 node đều nằm trong **1 thành phần liên thông duy nhất** (không còn khu nào bị "mắc kẹt" không tìm
-  được đường).
-- Vì mạng lưới rất chi tiết (nhiều điểm sát nhau), lời chỉ dẫn tự động **gộp các đoạn đi thẳng liên tiếp**
-  lại thành 1 dòng, chỉ tách dòng mới khi thực sự rẽ/đổi tầng/tới đích — nếu vẫn thấy chỉ dẫn hơi dài ở
-  vài lộ trình, có thể nới thêm ngưỡng góc "đi thẳng" trong hàm `turnLabel()` (`app.js`, hiện là 40°).
-- **41 chấm đỏ nằm đè lên ảnh toà nhà** (theo bạn mô tả là lối đi cho các tầng khác nhau) chưa được đưa
-  vào vì không có cách phân biệt chấm nào ứng với tầng nào (cùng 1 màu đỏ). Muốn dùng được, cần thêm 1
-  trong 2 cách: (1) báo lại thứ tự/tầng tương ứng của từng chấm, hoặc (2) lần sau đánh dấu mỗi tầng bằng
-  1 màu riêng để tự động phân biệt.
-- **29 chấm xanh (đích đến)** đã dò được toạ độ nhưng cũng chưa đưa vào `BUILDING_DIRECTORY` vì chưa rõ
-  tên khoa/phòng ứng với từng chấm — cần bạn xác nhận/đặt tên rồi gửi lại để em thêm vào.
+## Đường đi bám theo đúng các chấm đỏ do bạn tự đánh dấu trên ảnh (đã cập nhật lên bản gọn hơn — v2)
+- Bản đầu tiên có 174 điểm mặt bằng — quá dày khiến lời chỉ dẫn bị vụn thành hàng chục dòng rẽ trái/phải
+  liên tiếp cho những đoạn thực chất chỉ đi thẳng. Bạn đã chấm lại gọn hơn — giờ còn **51 điểm** (`P_G1`
+  đến `P_G51`), đặt tại các điểm quan trọng (đầu/cuối đoạn thẳng, chỗ rẽ, chỗ giao nhau).
+- Cách xử lý: so khác biệt pixel giữa ảnh gốc và ảnh mới đánh dấu để tìm đúng 51 vị trí, tự động nối các
+  điểm gần nhau (bán kính 90px) thành mạng lưới, phát hiện và vá 4 cụm bị tách rời để đảm bảo toàn bộ
+  183 node (bao gồm cả khu nhà/cổng/hành lang) nằm trong **1 thành phần liên thông duy nhất**.
+- Mọi khu nhà, cổng, hành lang nội thất (B01-B16, B08 chi tiết, B10 Sảnh A/B, B13 lối vào...) đã được
+  nối lại vào đúng điểm gần nhất trong mạng lưới mới này (thay vì mạng 174 điểm cũ).
+- Kết quả: số bước trong lời chỉ dẫn giảm đáng kể (ví dụ từ Cổng số 5 tới hầu hết các khu nhà giờ chỉ
+  còn 5-16 bước, thay vì 25-60 bước như bản trước).
+- Muốn tiếp tục tinh chỉnh mạng lưới (thêm/bớt/di chuyển điểm): xem hướng dẫn cách thêm 1 lối đi mới
+  trong `CONFIG-GUIDE.md`, hoặc đơn giản là chấm lại 1 ảnh mới và gửi lại — quy trình dò + tích hợp giờ
+  đã được chuẩn hoá nên làm lại rất nhanh.
 
 ## Cửa vào của khu nhà (isEntrance) + giới hạn lối đi TRONG NHÀ
 - **Toà Tháp đôi (B08)** là khu nhà duy nhất trong sơ đồ ghi rõ nhiều cửa vào riêng (Sảnh A, Sảnh B,
