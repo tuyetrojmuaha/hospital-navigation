@@ -57,6 +57,25 @@ cho phép chọn vị trí thủ công từ danh sách.
   ```
   Rồi cập nhật `MAP_IMAGE.width` / `MAP_IMAGE.height` trong `map-data.js` cho khớp kích thước ảnh mới.
 
+## Đích đến chi tiết theo từng khu chức năng cụ thể
+- Nhiều khu nhà giờ có **nhiều đích đến chi tiết** thay vì chỉ 1 điểm chung chung, theo đúng toạ độ
+  và tên khu chức năng thật bạn cung cấp:
+  - **Nhà N1A (B01)**: 5 khu ở Tầng 1 (Nhà thuốc số 2, Khu đăng ký khám dịch vụ, Khu đăng ký khám
+    BHYT, Khu hướng dẫn, Khu thanh toán) nối thành 1 hành lang, cộng thêm Tầng 2-4.
+  - **Nhà N1B (B02)**: Khu Xquang + Khu MRI ở Tầng 1, cộng thêm Tầng 2-4.
+  - **Nhà N2A (B03)**: Khu cấp phát thuốc BHYT ở Tầng 1, cộng thêm Tầng 2-4.
+  - **Nhà N3 (B06)**: Khu Xquang/điện tim/siêu âm ở Tầng 1 (có cả thang máy + thang bộ riêng), cộng
+    thêm Tầng 2-4.
+  - **Toà Tháp đôi (B08)**: xây lại hoàn toàn với 10 điểm chi tiết thay cho 4 cửa vào ước lượng cũ —
+    Khu Cấp cứu, Khu khám A, Khu khám B, Nhà thuốc số 1, Nhà Nội khoa, Nhà Ngoại khoa, Khối Cận lâm
+    sàng, Sảnh chính, cùng 2 điểm thang máy riêng của Nhà Nội khoa/Ngoại khoa.
+  - **Nhà Chỉ huy cơ quan (B10)**: tách thành Sảnh A (Ban Giám đốc) và Sảnh B (Khối cơ quan).
+  - **Nhà lưu trữ (B13)**: có lối vào cụ thể thay vì chỉ điểm tâm nhà.
+- Mỗi mục trong `BUILDING_DIRECTORY` giờ có thể có thêm field `nodeId` trỏ đúng tới node chi tiết đó —
+  khi tìm kiếm ra kết quả, app tính đường đi thẳng tới đúng điểm đó (không chỉ dừng ở cửa toà nhà chung).
+- Việc thêm/sửa các điểm chi tiết khác làm tương tự — xem ví dụ thật ngay trong `map-data.js` (tìm theo
+  các khối comment `// ===== B0...`) hoặc theo hướng dẫn tổng quát trong `CONFIG-GUIDE.md`.
+
 ## Dẫn đường LÊN TỪNG TẦNG THẬT cho 4 khu nhà có nhiều tầng (N1A, N1B, N2A, N3)
 - 4 khu nhà này (B01, B02, B03, B06) mỗi nhà có 4 tầng với công năng khác nhau. Dựa theo các chấm đỏ
   bạn đánh dấu đè lên ảnh 4 toà nhà này (hàng/cột chấm = hành lang), hệ thống giờ dựng:

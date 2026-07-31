@@ -172,10 +172,8 @@ const HOSPITAL_MAP = {
     // Lưu ý: chưa xác định được khoa nào trong B08 đi qua cửa nào (sơ đồ không ghi), nên
     // danh mục khoa/phòng của B08 (BUILDING_DIRECTORY) vẫn dùng chung, chỉ khác ở việc
     // chọn cửa vào gần nhất khi đến nơi.
-    { id: "B08_SANHC",  name: "Sảnh C (Toà Tháp đôi)",   x: 150, y: 605, floor: 1, isEntrance: true, parentBuilding: "B08" },
-    { id: "B08_CAPCUU", name: "Cửa Cấp cứu (Toà Tháp đôi)", x: 140, y: 645, floor: 1, isEntrance: true, parentBuilding: "B08" },
-    { id: "B08_SANHA",  name: "Sảnh A (Toà Tháp đôi)",   x: 195, y: 680, floor: 1, isEntrance: true, parentBuilding: "B08" },
-    { id: "B08_SANHB",  name: "Sảnh B (Toà Tháp đôi)",   x: 180, y: 755, floor: 1, isEntrance: true, parentBuilding: "B08" },
+    // (4 cửa vào ước lượng cũ B08_SANHA/B/C/CAPCUU đã được thay bằng 10 điểm chi tiết thật
+    // ở khối "B08 (Toà Tháp đôi)" bên dưới, dựa theo toạ độ + tên khu chức năng bạn cung cấp.)
 
     // ----- DIEM NUT LOI DI MAT BANG (174 diem, tu dong sinh tu ban danh dau tren anh) -----
     // Cac diem nay bam DUNG theo tung cham do ban da ve tren ảnh (khe/san trong giua cac toa nha).
@@ -354,11 +352,80 @@ const HOSPITAL_MAP = {
     { id: "P_G172", name: "Lối đi", x: 311, y: 1130, floor: 1, isWaypoint: true },
     { id: "P_G173", name: "Lối đi", x: 332, y: 1131, floor: 1, isWaypoint: true },
     { id: "P_G174", name: "Lối đi", x: 345, y: 1132, floor: 1, isWaypoint: true },
+    // ===== B01 (Nhà N1A) - TANG 1: 5 khu chuc nang rieng =====
+    { id: "B01_F1_THUOC", name: "Nhà thuốc số 2 (Nhà N1A, Tầng 1)", x: 257, y: 399, floor: 1, isDestination: true },
+    { id: "B01_F1_DKKD", name: "Khu đăng ký khám dịch vụ (Nhà N1A, Tầng 1)", x: 294, y: 390, floor: 1, isDestination: true },
+    { id: "B01_F1_BHYT", name: "Khu đăng ký khám BHYT (Nhà N1A, Tầng 1)", x: 311, y: 398, floor: 1, isDestination: true },
+    { id: "B01_F1_HD", name: "Khu hướng dẫn (Nhà N1A, Tầng 1)", x: 327, y: 398, floor: 1, isDestination: true },
+    { id: "B01_F1_TT", name: "Khu thanh toán (Nhà N1A, Tầng 1)", x: 376, y: 398, floor: 1, isDestination: true },
+
+    // ===== B02 (Nhà N1B) - TANG 1: 2 khu chuc nang =====
+    { id: "B02_F1_XQUANG", name: "Khu vực Xquang (Nhà N1B, Tầng 1)", x: 400, y: 397, floor: 1, isDestination: true },
+    { id: "B02_F1_MRI", name: "Khu vực Cộng hưởng từ MRI (Nhà N1B, Tầng 1)", x: 400, y: 410, floor: 1, isDestination: true },
+
+    // ===== B03 (Nhà N2A) - moi tang 1 khu duy nhat =====
+    { id: "B03_F1_BHYT", name: "Khu vực cấp phát thuốc BHYT (Nhà N2A, Tầng 1)", x: 337, y: 440, floor: 1, isDestination: true },
+
+    // ===== B06 (Nhà N3) - TANG 1 =====
+    { id: "B06_F1_XQUANG", name: "Khu vực Xquang, điện tim, siêu âm (Nhà N3, Tầng 1)", x: 521, y: 507, floor: 1, isDestination: true },
+    { id: "B06_TM", name: "Thang máy (Nhà N3)", x: 478, y: 507, floor: 1, isDestination: true },
+    { id: "B06_TB", name: "Thang bộ (Nhà N3)", x: 506, y: 497, floor: 1, isDestination: true },
+
+    // ===== B08 (Toà Tháp đôi) - 10 diem chi tiet, thay cho 4 cua vao uoc luong cu =====
+    { id: "B08_CAPCUU", name: "Khu Cấp cứu C1.3 (Toà Tháp đôi)", x: 142, y: 566, floor: 1, isDestination: true },
+    { id: "B08_KHAMA", name: "Khu khám A - Bộ đội hưu và Viettel (Toà Tháp đôi)", x: 209, y: 592, floor: 1, isDestination: true },
+    { id: "B08_NGOAIKHOA", name: "Nhà Ngoại khoa (Toà Tháp đôi)", x: 237, y: 593, floor: 1, isDestination: true },
+    { id: "B08_TM_NGOAIKHOA", name: "Thang máy Nhà Ngoại khoa (Toà Tháp đôi)", x: 200, y: 628, floor: 1, isDestination: true },
+    { id: "B08_TM_CANLAMSANG", name: "Khối nhà Cận lâm sàng (Toà Tháp đôi)", x: 167, y: 669, floor: 1, isDestination: true },
+    { id: "B08_SANHCHINH", name: "Sảnh chính Toà Tháp đôi", x: 235, y: 670, floor: 1, isDestination: true },
+    { id: "B08_KHAMB", name: "Khu khám B, khu thanh toán (Toà Tháp đôi)", x: 209, y: 729, floor: 1, isDestination: true },
+    { id: "B08_NHATHUOC1", name: "Nhà thuốc số 1 (Toà Tháp đôi)", x: 144, y: 717, floor: 1, isDestination: true },
+    { id: "B08_NOIKHOA", name: "Nhà Nội khoa (Toà Tháp đôi)", x: 237, y: 733, floor: 1, isDestination: true },
+    { id: "B08_TM_NOIKHOA", name: "Thang máy Nhà Nội khoa (Toà Tháp đôi)", x: 200, y: 705, floor: 1, isDestination: true },
+
+    // ===== B10 (Nha Chi huy co quan) - 2 sanh rieng =====
+    { id: "B10_SANHB", name: "Sảnh B (Nhà Chỉ huy cơ quan)", x: 447, y: 750, floor: 1, isDestination: true },
+    { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 497, y: 722, floor: 1, isDestination: true },
+
+    // ===== B13 - loi vao cu the =====
+    { id: "B13_LOIVAO", name: "Lối vào Nhà lưu trú", x: 160, y: 910, floor: 1, isDestination: true },
   ],
 
   // Lối đi giữa các mốc - đi theo khoảng SÂN/ĐƯỜNG TRỐNG thực tế, ĐÚNG TẠI các hàng mũi tên
   // đỏ hai chiều trên sơ đồ gốc. KHÔNG nối thẳng building với building.
   edges: [
+    { from: "B01_F1_THUOC", to: "B01_F1_DKKD" },
+    { from: "B01_F1_DKKD", to: "B01_F1_BHYT" },
+    { from: "B01_F1_BHYT", to: "B01_F1_HD" },
+    { from: "B01_F1_HD", to: "B01_F1_TT" },
+    { from: "B01", to: "B01_F1_THUOC" },
+    { from: "B01_F1_HD", to: "B01_F2_5", isElevator: true, instruction: "Đi thang máy/thang bộ (cạnh Khu hướng dẫn) lên Tầng 2 - Nhà N1A" },
+    { from: "B01_F1_DKKD", to: "B01_F2_5", isElevator: true, instruction: "Đi thang máy/thang bộ (cạnh Khu đăng ký khám dịch vụ) lên Tầng 2 - Nhà N1A" },
+    { from: "B02_F1_XQUANG", to: "B02_F1_MRI" },
+    { from: "B02", to: "B02_F1_XQUANG" },
+    { from: "B02_F1_XQUANG", to: "B02_F2_6", isElevator: true, instruction: "Đi thang bộ lên Tầng 2 - Nhà N1B" },
+    { from: "B03", to: "B03_F1_BHYT" },
+    { from: "B03_F1_BHYT", to: "B03_F2_4", isElevator: true, instruction: "Đi thang máy/thang bộ lên Tầng 2 - Nhà N2A" },
+    { from: "B06", to: "B06_F1_XQUANG" },
+    { from: "B06_F1_XQUANG", to: "B06_TB" },
+    { from: "B06_TB", to: "B06_TM" },
+    { from: "B06_TM", to: "B06_F2_7", isElevator: true, instruction: "Đi thang máy lên Tầng 2 - Nhà N3" },
+    { from: "B08_CAPCUU", to: "B08_KHAMA" },
+    { from: "B08_KHAMA", to: "B08_NGOAIKHOA" },
+    { from: "B08_NGOAIKHOA", to: "B08_TM_NGOAIKHOA" },
+    { from: "B08_TM_NGOAIKHOA", to: "B08_TM_CANLAMSANG" },
+    { from: "B08_TM_CANLAMSANG", to: "B08_SANHCHINH" },
+    { from: "B08_SANHCHINH", to: "B08_KHAMB" },
+    { from: "B08_KHAMB", to: "B08_NHATHUOC1" },
+    { from: "B08_KHAMB", to: "B08_NOIKHOA" },
+    { from: "B08_NOIKHOA", to: "B08_TM_NOIKHOA" },
+    { from: "B08", to: "B08_SANHCHINH" },
+    { from: "B08_SANHCHINH", to: "P_G101" },
+    { from: "B08_CAPCUU", to: "P_G86" },
+    { from: "B08_NOIKHOA", to: "P_G128" },
+    { from: "B10_SANHA", to: "B10_SANHB" },
+    { from: "B10", to: "B10_SANHA" },
+    { from: "B13", to: "B13_LOIVAO" },
     { from: "B01_F1_1", to: "B01_F1_2" },
     { from: "B01_F1_2", to: "B01_F1_3" },
     { from: "B01_F1_3", to: "B01_F1_4" },
@@ -725,14 +792,7 @@ const HOSPITAL_MAP = {
     { from: "B16", to: "P_G174" },
 
     // ----- 4 CUA VAO THAT CUA TOA THAP DOI (B08) NOI TOI DIEM MAT BANG GAN NHAT -----
-    { from: "B08_SANHC", to: "P_G86" },
-    { from: "B08_CAPCUU", to: "P_G86" },
-    { from: "B08_SANHA", to: "P_G101" },
-    { from: "B08_SANHB", to: "P_G127" },
-    { from: "B08_SANHC",  to: "B08", instruction: "Vào toà nhà qua Sảnh C", icon: "🚪" },
-    { from: "B08_CAPCUU", to: "B08", instruction: "Vào thẳng khu Cấp cứu (cửa riêng, không qua sảnh chính)", icon: "🚑" },
-    { from: "B08_SANHA",  to: "B08", instruction: "Vào toà nhà qua Sảnh A", icon: "🚪" },
-    { from: "B08_SANHB",  to: "B08", instruction: "Vào toà nhà qua Sảnh B", icon: "🚪" },
+    // (8 cạnh cũ nối B08_SANHA/B/C/CAPCUU đã thay bằng cạnh mới trong block B08 chi tiết bên dưới)
   ],
 };
 
@@ -744,51 +804,58 @@ const HOSPITAL_MAP = {
  */
 const BUILDING_DIRECTORY = {
   B01: [
-    { floor: 1, desc: "Đăng ký khám bệnh, Nhà thuốc số 2" },
-    { floor: 2, desc: "Các phòng khám / Khoa C1.1-A", nodeId: "B01_F2_5" },
-    { floor: 3, desc: "Khu vực lấy mẫu xét nghiệm / Khoa C1.1-B", nodeId: "B01_F3_5" },
-    { floor: 4, desc: "Xquang, điện tim, siêu âm / Khoa C1.1-B", nodeId: "B01_F4_5" },
+    { floor: 1, desc: "Nhà thuốc số 2 C1.1A", nodeId: "B01_F1_THUOC" },
+    { floor: 1, desc: "Khu đăng ký khám dịch vụ C1.1A", nodeId: "B01_F1_DKKD" },
+    { floor: 1, desc: "Khu đăng ký khám BHYT C1.1A", nodeId: "B01_F1_BHYT" },
+    { floor: 1, desc: "Khu hướng dẫn C1.1A", nodeId: "B01_F1_HD" },
+    { floor: 1, desc: "Khu thanh toán C1.1A", nodeId: "B01_F1_TT" },
+    { floor: 2, desc: "Các phòng khám từ 1-20 C1.1A", nodeId: "B01_F2_5" },
+    { floor: 3, desc: "Khu vực lấy mẫu xét nghiệm theo yêu cầu C1.1B", nodeId: "B01_F3_5" },
+    { floor: 4, desc: "Khu vực Xquang, điện tim, siêu âm theo yêu cầu C1.1B", nodeId: "B01_F4_5" },
   ],
   B02: [
-    { floor: 1, desc: "Xquang, cộng hưởng từ MRI / Khoa C1.1-A" },
-    { floor: 2, desc: "Các phòng khám / Khoa C1.1-A", nodeId: "B02_F2_6" },
-    { floor: 3, desc: "Các phòng khám / Khoa C1.1-B", nodeId: "B02_F3_6" },
-    { floor: 4, desc: "Xquang, cộng hưởng từ MRI / Khoa C1.1-B", nodeId: "B02_F4_6" },
+    { floor: 1, desc: "Khu vực Xquang C1.1A", nodeId: "B02_F1_XQUANG" },
+    { floor: 1, desc: "Khu vực Cộng hưởng từ, MRI C1.1A", nodeId: "B02_F1_MRI" },
+    { floor: 2, desc: "Các phòng khám C1.1A", nodeId: "B02_F2_6" },
+    { floor: 3, desc: "Các phòng khám theo yêu cầu C1.1B", nodeId: "B02_F3_6" },
+    { floor: 4, desc: "Khu vực nội soi theo yêu cầu C1.1B", nodeId: "B02_F4_6" },
   ],
   B03: [
-    { floor: 1, desc: "Cấp phát thuốc BHYT" },
-    { floor: 2, desc: "Các phòng khám / Khoa C1.1-A", nodeId: "B03_F2_4" },
-    { floor: 3, desc: "Các phòng khám / Khoa C1.1-B", nodeId: "B03_F3_4" },
-    { floor: 4, desc: "Khu vực nội soi / Khoa C1.1-A", nodeId: "B03_F4_4" },
+    { floor: 1, desc: "Khu vực cấp phát thuốc BHYT", nodeId: "B03_F1_BHYT" },
+    { floor: 2, desc: "Các phòng khám C1.1A", nodeId: "B03_F2_4" },
+    { floor: 3, desc: "Các phòng khám theo yêu cầu C1.1B", nodeId: "B03_F3_4" },
+    { floor: 4, desc: "Khu vực nội soi theo yêu cầu C1.1B", nodeId: "B03_F4_4" },
   ],
   B04: [
-    { floor: 1, desc: "Khu vực nội soi / Khoa C1.1-A" },
+    { floor: 1, desc: "Khu vực nội soi C1.1A", nodeId: "B04" },
   ],
   B05: [
-    { floor: null, desc: "Trung tâm máy gia tốc" },
+    { floor: null, desc: "Trung tâm máy gia tốc", nodeId: "B05" },
   ],
   B06: [
-    { floor: 1, desc: "Xquang, điện tim, siêu âm / Khoa C1.1-A" },
+    { floor: 1, desc: "Khu vực Xquang, điện tim, siêu âm C1.1A", nodeId: "B06_F1_XQUANG" },
     { floor: 2, desc: "Trung tâm khám sức khoẻ định kỳ", nodeId: "B06_F2_7" },
-    { floor: 3, desc: "Các phòng khám / Khoa C1.1-B", nodeId: "B06_F3_7" },
-    { floor: 4, desc: "Khoa điều trị theo yêu cầu", nodeId: "B06_F4_7" },
+    { floor: 3, desc: "Các phòng khám theo yêu cầu C1.1B", nodeId: "B06_F3_7" },
+    { floor: 4, desc: "Khoa điều trị theo yêu cầu C1.1B", nodeId: "B06_F4_7" },
   ],
   B07: [
-    { floor: null, desc: "Trung tâm thẩm mỹ" },
+    { floor: null, desc: "Trung tâm thẩm mỹ", nodeId: "B07" },
   ],
   B08: [
-    { floor: null, desc: "Khoa Cấp cứu C1-3" },
-    { floor: null, desc: "Khu khám A, B và Viettel" },
-    { floor: null, desc: "Khối nhà điều trị Nội khoa" },
-    { floor: null, desc: "Khối nhà điều trị Ngoại khoa" },
-    { floor: null, desc: "Khối nhà Cận lâm sàng" },
+    { floor: null, desc: "Khu Cấp cứu C1.3", nodeId: "B08_CAPCUU" },
+    { floor: null, desc: "Khu khám A - Bộ đội hưu và Viettel", nodeId: "B08_KHAMA" },
+    { floor: null, desc: "Khu khám B, khu thanh toán", nodeId: "B08_KHAMB" },
+    { floor: null, desc: "Nhà thuốc số 1", nodeId: "B08_NHATHUOC1" },
+    { floor: null, desc: "Nhà Nội khoa", nodeId: "B08_NOIKHOA" },
+    { floor: null, desc: "Nhà Ngoại khoa", nodeId: "B08_NGOAIKHOA" },
+    { floor: null, desc: "Khối nhà Cận lâm sàng", nodeId: "B08_TM_CANLAMSANG" },
   ],
   B09: [
     { floor: null, desc: "Viện Bảo vệ, chăm sóc sức khoẻ cán bộ Trung ương" },
   ],
   B10: [
-    { floor: null, desc: "Ban Giám đốc" },
-    { floor: null, desc: "Khối cơ quan" },
+    { floor: null, desc: "Sảnh A - Ban Giám đốc", nodeId: "B10_SANHA" },
+    { floor: null, desc: "Sảnh B - Khối cơ quan", nodeId: "B10_SANHB" },
   ],
   B11: [
     { floor: 1, desc: "Khu khám bệnh truyền nhiễm" },
@@ -798,10 +865,10 @@ const BUILDING_DIRECTORY = {
     { floor: 6, desc: "Khoa Bệnh lây đường máu" },
   ],
   B12: [{ floor: null, desc: "Nhà để xe nhân viên" }],
-  B13: [{ floor: null, desc: "Nhà lưu trữ" }],
+  B13: [{ floor: null, desc: "Lối vào Nhà lưu trú", nodeId: "B13_LOIVAO" }],
   B14: [{ floor: null, desc: "Nhà thể thao đa năng" }],
   B15: [{ floor: null, desc: "Nhà thể thao đa năng" }],
-  B16: [{ floor: null, desc: "Nhà tang lễ" }],
+  B16: [{ floor: null, desc: "Nhà tang lễ", nodeId: "B16" }],
 };
 
 /**
