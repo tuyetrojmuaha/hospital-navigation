@@ -57,6 +57,21 @@ cho phép chọn vị trí thủ công từ danh sách.
   ```
   Rồi cập nhật `MAP_IMAGE.width` / `MAP_IMAGE.height` trong `map-data.js` cho khớp kích thước ảnh mới.
 
+## Chỉ in mã QR ở những điểm cần thiết (không phải toàn bộ 183 điểm)
+- Trước đây `admin.html` tạo QR cho **tất cả** node trên bản đồ (kể cả từng điểm mặt bằng lẻ) — không
+  thực tế để in và dán tường. Giờ chỉ in QR cho 3 loại điểm:
+  1. **Cổng ra vào** (`isGate: true`) — 4 điểm.
+  2. **Đích đến thật** (`isDestination: true`) — các khu nhà, khoa/phòng, hành lang từng tầng — 40 điểm.
+  3. **Điểm lối đi quan trọng** (`isQRPoint: true`) — các "nút thắt" thực sự của mạng lưới (nút mà nếu
+     thiếu sẽ làm đứt mạng lưới thành 2 phần) + các điểm ngay sát cổng ra vào — chọn tự động bằng thuật
+     toán tìm điểm cắt (articulation point), không phải chọn bằng mắt — 18 điểm.
+- Tổng cộng còn **62 mã QR** cần in, giảm mạnh so với 183.
+- Muốn thêm/bớt điểm nào được in QR: mở `map-data.js`, thêm hoặc xoá `isQRPoint: true` ở node đó — không
+  cần sửa gì trong `admin.html`, bộ lọc tự động cập nhật theo.
+- Quét QR ở BẤT KỲ điểm nào trong 62 điểm này (kể cả các điểm lối đi, không chỉ khu nhà) đều nhận đúng
+  đó là vị trí hiện tại — cơ chế này vốn đã tổng quát sẵn (`setCurrentLocation()` trong `app.js` chấp
+  nhận mọi loại node hợp lệ), không cần sửa thêm.
+
 ## Đích đến chi tiết theo từng khu chức năng cụ thể
 - Nhiều khu nhà giờ có **nhiều đích đến chi tiết** thay vì chỉ 1 điểm chung chung, theo đúng toạ độ
   và tên khu chức năng thật bạn cung cấp:

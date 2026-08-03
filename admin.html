@@ -30,13 +30,14 @@
     </label>
     <input id="base-url-input" type="text" class="search-input" style="margin-top:4px;" />
   </div>
-  <button class="no-print btn-secondary" style="display:block;margin:0 auto 16px;" onclick="window.print()">In tất cả mã QR</button>
+  <button class="no-print btn-secondary" style="display:block;margin:0 auto 8px;" onclick="window.print()">In tất cả mã QR</button>
+  <p id="qr-count" class="no-print" style="text-align:center; font-size:13px; color:#6b7280; margin-bottom:16px;"></p>
 
   <div id="qr-grid" class="qr-grid"></div>
 
   <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script src="map-image.js?v=3"></script>
-  <script src="map-data.js?v=3"></script>
+  <script src="map-image.js?v=4"></script>
+  <script src="map-data.js?v=4"></script>
   <script>
     // Địa chỉ trang thật sau khi deploy lên GitHub Pages. Sửa lại đây nếu domain đổi.
     const guessedBaseUrl = "https://tuyetrojmuaha.github.io/hospital-navigation/index.html";
@@ -47,7 +48,11 @@
     function renderAllQrCodes() {
       const baseUrl = document.getElementById("base-url-input").value.trim() || guessedBaseUrl;
       grid.innerHTML = "";
-      HOSPITAL_MAP.nodes.forEach((node) => {
+      // Chỉ in mã QR cho: điểm đích đến thật (isDestination), cổng ra vào (isGate), và các điểm
+      // lối đi quan trọng đã chọn lọc (isQRPoint - nút giao/gần cổng). KHÔNG in cho từng điểm
+      // mặt bằng lẻ tẻ (quá nhiều, không thực tế để dán tường).
+      const qrEligible = HOSPITAL_MAP.nodes.filter((n) => n.isDestination || n.isGate || n.isQRPoint);
+      qrEligible.forEach((node) => {
         const card = document.createElement("div");
         card.className = "qr-card";
         const canvasHolder = document.createElement("div");
@@ -61,7 +66,8 @@
         const link = `${baseUrl}?node=${encodeURIComponent(node.id)}`;
         const idEl = document.createElement("div");
         idEl.className = "qr-id";
-        idEl.textContent = node.isGate ? `${node.id} · Cổng` : `${node.id} · Khu nhà`;
+        const typeLabel = node.isGate ? "Cổng" : node.isQRPoint ? "Lối đi (nút giao)" : "Đích đến";
+        idEl.textContent = `${node.id} · ${typeLabel}`;
         card.appendChild(idEl);
 
         grid.appendChild(card);
@@ -73,6 +79,9 @@
           height: 160,
         });
       });
+
+      const countEl = document.getElementById("qr-count");
+      if (countEl) countEl.textContent = `Sẽ in ${qrEligible.length} mã QR (trong tổng số ${HOSPITAL_MAP.nodes.length} điểm trên bản đồ).`;
     }
 
     document.getElementById("base-url-input").addEventListener("change", renderAllQrCodes);
