@@ -525,6 +525,16 @@ const HOSPITAL_MAP = {
     { from: "B08_SANHCHINH", to: "P_G30" },
     { from: "B08_CAPCUU", to: "P_G26" },
     { from: "B08_NOIKHOA", to: "P_G30" },
+
+    // ===== NOI THANG cho cac diem co cua/loi vao rieng (tranh phai vong qua node cha) =====
+    // Phát hiện qua phản hồi thực tế: Sảnh A của B10 nằm xa B10 nên đi vòng xuống B10 trước
+    // khi ra ngoài — giờ nối thẳng từng điểm tới đúng lối đi mặt bằng gần NÓ nhất.
+    { from: "B10_SANHA", to: "P_G33" },
+    { from: "B10_SANHB", to: "P_G36" },
+    { from: "B13_LOIVAO", to: "P_G45" },
+    { from: "B08_KHAMA", to: "P_G23" },
+    { from: "B08_TM_CANLAMSANG", to: "P_G26" },
+    { from: "B08_KHAMB", to: "P_G41" },
   ],
 };
 
