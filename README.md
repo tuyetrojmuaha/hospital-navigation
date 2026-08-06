@@ -72,6 +72,23 @@ cho phép chọn vị trí thủ công từ danh sách.
   đó là vị trí hiện tại — cơ chế này vốn đã tổng quát sẵn (`setCurrentLocation()` trong `app.js` chấp
   nhận mọi loại node hợp lệ), không cần sửa thêm.
 
+## Không cho phép "cắt ngang" qua phòng/khu chức năng của người khác
+- Trước đây, nếu đường ngắn nhất tình cờ đi qua 1 điểm ĐÍCH cụ thể (vd 1 phòng khám, 1 quầy dịch vụ)
+  để tới nơi khác, hệ thống vẫn dùng bình thường — không thực tế vì không ai được đi xuyên qua phòng
+  người khác chỉ để tới chỗ khác.
+- Giờ mọi điểm có `isDestination: true` (phòng/khu chức năng cụ thể) bị **phạt nặng** nếu bị dùng làm
+  điểm trung chuyển cho 1 lộ trình tới nơi khác — hệ thống sẽ luôn ưu tiên đường khác nếu có, và chỉ
+  dùng lại nếu THẬT SỰ không còn đường nào khác (đảm bảo không có điểm nào bị "mất tích" khỏi tìm kiếm).
+- Ngoại lệ: các điểm hạ tầng dùng chung — **thang máy, thang bộ, waypoint mặt bằng, cổng ra vào** — vẫn
+  được đi ngang qua bình thường, vì đó là hạ tầng công cộng thật, không phải phòng riêng. Một điểm tự
+  động được coi là "hạ tầng chung" nếu: là waypoint/cổng, có cạnh thang máy (`isElevator`) gắn trực tiếp,
+  hoặc được đánh dấu thủ công `isTransitPoint: true` (áp dụng cho 4 điểm thang máy/thang bộ trong Toà
+  Tháp đôi và Nhà N3 vốn không có cạnh đổi tầng).
+- Logic này nằm trong hàm `findShortestPath()` ở `app.js` (biến `THROUGH_DESTINATION_PENALTY`).
+- Về việc "không đi xuyên qua toà nhà": khu vực quanh Nhà 03 (N2A) có lối đi ngầm thật ở tầng 1, các
+  điểm mặt bằng quanh đó (P_G12, P_G13, P_G17, P_G21...) đại diện đúng cho lối ngầm này nên **giữ
+  nguyên**, không phải lỗi cắt xuyên qua nhà.
+
 ## Đích đến chi tiết theo từng khu chức năng cụ thể
 - Nhiều khu nhà giờ có **nhiều đích đến chi tiết** thay vì chỉ 1 điểm chung chung, theo đúng toạ độ
   và tên khu chức năng thật bạn cung cấp:

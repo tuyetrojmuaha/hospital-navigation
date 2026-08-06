@@ -247,19 +247,19 @@ const HOSPITAL_MAP = {
     // ===== B06 (Nhà N3) - TANG 1 =====
     { id: "B06_F1_XQUANG", name: "Khu vực Xquang, điện tim, siêu âm (Nhà N3, Tầng 1)", x: 521, y: 507, floor: 1, isDestination: true },
     { id: "B06_TM", name: "Thang máy (Nhà N3)", x: 478, y: 507, floor: 1, isDestination: true },
-    { id: "B06_TB", name: "Thang bộ (Nhà N3)", x: 506, y: 497, floor: 1, isDestination: true },
+    { id: "B06_TB", name: "Thang bộ (Nhà N3)", x: 506, y: 497, floor: 1, isDestination: true, isTransitPoint: true },
 
     // ===== B08 (Toà Tháp đôi) - 10 diem chi tiet, thay cho 4 cua vao uoc luong cu =====
     { id: "B08_CAPCUU", name: "Khu Cấp cứu C1.3 (Toà Tháp đôi)", x: 142, y: 566, floor: 1, isDestination: true },
     { id: "B08_KHAMA", name: "Khu khám A - Bộ đội hưu và Viettel (Toà Tháp đôi)", x: 209, y: 592, floor: 1, isDestination: true },
     { id: "B08_NGOAIKHOA", name: "Nhà Ngoại khoa (Toà Tháp đôi)", x: 237, y: 593, floor: 1, isDestination: true },
-    { id: "B08_TM_NGOAIKHOA", name: "Thang máy Nhà Ngoại khoa (Toà Tháp đôi)", x: 200, y: 628, floor: 1, isDestination: true },
-    { id: "B08_TM_CANLAMSANG", name: "Khối nhà Cận lâm sàng (Toà Tháp đôi)", x: 167, y: 669, floor: 1, isDestination: true },
+    { id: "B08_TM_NGOAIKHOA", name: "Thang máy Nhà Ngoại khoa (Toà Tháp đôi)", x: 200, y: 628, floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B08_TM_CANLAMSANG", name: "Khối nhà Cận lâm sàng - thang máy (Toà Tháp đôi)", x: 167, y: 669, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B08_SANHCHINH", name: "Sảnh chính Toà Tháp đôi", x: 235, y: 670, floor: 1, isDestination: true },
     { id: "B08_KHAMB", name: "Khu khám B, khu thanh toán (Toà Tháp đôi)", x: 209, y: 729, floor: 1, isDestination: true },
     { id: "B08_NHATHUOC1", name: "Nhà thuốc số 1 (Toà Tháp đôi)", x: 144, y: 717, floor: 1, isDestination: true },
     { id: "B08_NOIKHOA", name: "Nhà Nội khoa (Toà Tháp đôi)", x: 237, y: 733, floor: 1, isDestination: true },
-    { id: "B08_TM_NOIKHOA", name: "Thang máy Nhà Nội khoa (Toà Tháp đôi)", x: 200, y: 705, floor: 1, isDestination: true },
+    { id: "B08_TM_NOIKHOA", name: "Thang máy Nhà Nội khoa (Toà Tháp đôi)", x: 200, y: 705, floor: 1, isDestination: true, isTransitPoint: true },
 
     // ===== B10 (Nha Chi huy co quan) - 2 sanh rieng =====
     { id: "B10_SANHB", name: "Sảnh B (Nhà Chỉ huy cơ quan)", x: 447, y: 750, floor: 1, isDestination: true },

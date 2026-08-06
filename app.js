@@ -18,6 +18,20 @@ HOSPITAL_MAP.edges.forEach((e) => {
   adjacency[e.to].push({ to: e.from, weight: w, isElevator: !!e.isElevator, instruction: e.instruction, icon: e.icon });
 });
 
+// Một điểm được coi là "hạ tầng chung" (được phép đi NGANG QUA để tới chỗ khác) nếu là:
+// điểm lối đi mặt bằng (isWaypoint), cổng ra vào (isGate), được đánh dấu rõ isTransitPoint
+// (vd các điểm thang máy/thang bộ trong Toà Tháp đôi), hoặc có cạnh thang máy (isElevator)
+// gắn trực tiếp vào nó (vì bản thân việc lên/xuống tầng bắt buộc phải "đi qua" đúng điểm đó).
+// Các điểm ĐÍCH CỤ THỂ khác (phòng khám, khu chức năng...) sẽ bị PHẠT NẶNG nếu bị dùng làm
+// điểm trung chuyển cho một lộ trình tới nơi khác - không cắt ngang qua phòng người khác.
+function isTransitInfrastructure(nodeId) {
+  const n = nodeById[nodeId];
+  if (!n) return false;
+  if (n.isWaypoint || n.isGate || n.isTransitPoint) return true;
+  return (adjacency[nodeId] || []).some((e) => e.isElevator);
+}
+const THROUGH_DESTINATION_PENALTY = 5000; // đủ lớn để Dijkstra luôn ưu tiên đường khác nếu có
+
 // ============================================================
 // 2. THUẬT TOÁN DIJKSTRA - TÌM ĐƯỜNG NGẮN NHẤT
 // ============================================================
@@ -43,7 +57,17 @@ function findShortestPath(startId, endId) {
     visited.add(current);
 
     for (const edge of adjacency[current]) {
-      const alt = dist[current] + edge.weight;
+      let weight = edge.weight;
+      // Nếu "current" là 1 điểm ĐÍCH cụ thể (không phải hạ tầng chung) và KHÔNG phải điểm
+      // xuất phát/đích của chính lộ trình đang tìm, phạt nặng việc đi tiếp từ đây - tức là
+      // không cho phép "cắt ngang" qua phòng/khu chức năng của người khác để tới nơi khác.
+      if (current !== startId && current !== endId) {
+        const n = nodeById[current];
+        if (n && n.isDestination && !isTransitInfrastructure(current)) {
+          weight += THROUGH_DESTINATION_PENALTY;
+        }
+      }
+      const alt = dist[current] + weight;
       if (alt < dist[edge.to]) {
         dist[edge.to] = alt;
         prev[edge.to] = { id: current, edge };
