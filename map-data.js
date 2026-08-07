@@ -227,6 +227,11 @@ const HOSPITAL_MAP = {
     { id: "P_G49", name: "Lối đi gần Nhà để xe nhân viên", x: 195, y: 1031, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G50", name: "Lối đi gần Nhà tang lễ", x: 292, y: 1126, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G51", name: "Lối đi", x: 346, y: 1127, floor: 1, isWaypoint: true },
+    // 2 điểm bổ sung: vỉa hè đường Trần Thánh Tông, bắc cầu qua khoảng trống dọc mặt Tây
+    // nhà 08 (giữa Sảnh C và Sảnh B) - trước đây không có điểm nào ở đây nên bị vòng xa
+    // qua tận phía Đông (qua sân vườn) mới tới được.
+    { id: "P_G53", name: "Lối đi", x: 100, y: 560, floor: 1, isWaypoint: true },
+    { id: "P_G54", name: "Lối đi", x: 100, y: 780, floor: 1, isWaypoint: true },
     // Điểm bổ sung: mép sân lát đá bên trái đỉnh vườn hoa tam giác (giữa Toà Tháp đôi và Nhà 09),
     // để đi thẳng theo đúng mép sân thay vì vòng xa qua bên phải/dưới vườn hoa.
     // (Đã bỏ P_G52 - nối thẳng P_G27 tới P_G30 đi sát đúng đỉnh chóp tam giác vườn hoa,
@@ -510,6 +515,7 @@ const HOSPITAL_MAP = {
 
     // ===== NOI KHU NHA/CONG/HANH LANG TOI DIEM MAT BANG MOI GAN NHAT =====
     { from: "G_1A", to: "P_G2" },
+    { from: "G_1A", to: "P_G8" },
     { from: "G_1B", to: "P_G1" },
     { from: "G_CC", to: "P_G19" },
     { from: "G_5", to: "P_G48" },
@@ -524,6 +530,10 @@ const HOSPITAL_MAP = {
     { from: "B10", to: "P_G36" },
     { from: "B11", to: "P_G44" },
     { from: "B12", to: "P_G45" },
+    { from: "B12", to: "P_G49" },
+    { from: "P_G26", to: "P_G53" },
+    { from: "P_G53", to: "P_G54" },
+    { from: "P_G54", to: "P_G40" },
     { from: "B13", to: "P_G43" },
     { from: "B14", to: "P_G33" },
     { from: "B15", to: "P_G33" },
