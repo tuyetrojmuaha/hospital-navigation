@@ -229,7 +229,8 @@ const HOSPITAL_MAP = {
     { id: "P_G51", name: "Lối đi", x: 346, y: 1127, floor: 1, isWaypoint: true },
     // Điểm bổ sung: mép sân lát đá bên trái đỉnh vườn hoa tam giác (giữa Toà Tháp đôi và Nhà 09),
     // để đi thẳng theo đúng mép sân thay vì vòng xa qua bên phải/dưới vườn hoa.
-    { id: "P_G52", name: "Lối đi", x: 300, y: 608, floor: 1, isWaypoint: true },
+    // (Đã bỏ P_G52 - nối thẳng P_G27 tới P_G30 đi sát đúng đỉnh chóp tam giác vườn hoa,
+    // không cần điểm trung gian.)
     // ===== B01 (Nhà N1A) - TANG 1: 5 khu chuc nang rieng =====
     { id: "B01_F1_THUOC", name: "Nhà thuốc số 2 (Nhà N1A, Tầng 1)", x: 257, y: 399, floor: 1, isDestination: true },
     { id: "B01_F1_DKKD", name: "Khu đăng ký khám dịch vụ (Nhà N1A, Tầng 1)", x: 294, y: 390, floor: 1, isDestination: true },
@@ -462,8 +463,7 @@ const HOSPITAL_MAP = {
     // (Đã xoá cạnh P_G29 -> P_G30 vì cắt thẳng qua vườn hoa tam giác giữa Toà Tháp đôi và Nhà 09.
     // Giờ buộc phải đi vòng qua P_G31 - P_G30, đúng theo mép sân quanh vườn hoa.)
     { from: "P_G29", to: "P_G31" },
-    { from: "P_G27", to: "P_G52" },
-    { from: "P_G52", to: "P_G30" },
+    { from: "P_G27", to: "P_G30" },
     { from: "P_G29", to: "P_G32" },
     { from: "P_G29", to: "P_G34" },
     { from: "P_G29", to: "P_G35" },
