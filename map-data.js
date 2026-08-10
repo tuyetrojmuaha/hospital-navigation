@@ -266,7 +266,7 @@ const HOSPITAL_MAP = {
     { from: "B01_F1_DKKD", to: "B01_F1_BHYT" },
     { from: "B01_F1_BHYT", to: "B01_F1_HD" },
     { from: "B01_F1_HD", to: "B01_F1_TT" },
-    { from: "B01", to: "B01_F1_THUOC" },
+    { from: "B01", to: "B01_F1_DKKD" },
     { from: "B01_F1_HD", to: "B01_F2_5", isElevator: true, instruction: "Đi thang máy/thang bộ (cạnh Khu hướng dẫn) lên Tầng 2 - Nhà N1A" },
     { from: "B01_F1_DKKD", to: "B01_F2_5", isElevator: true, instruction: "Đi thang máy/thang bộ (cạnh Khu đăng ký khám dịch vụ) lên Tầng 2 - Nhà N1A" },
     { from: "B02_F1_XQUANG", to: "B02_F1_MRI" },
