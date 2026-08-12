@@ -12,8 +12,14 @@ function euclideanDistance(a, b) {
 
 const adjacency = {}; // adjacency[nodeId] = [{to, weight, isElevator, instruction, icon}]
 HOSPITAL_MAP.nodes.forEach((n) => (adjacency[n.id] = []));
+// Các node ở tầng trên thường dùng CHUNG toạ độ x,y với node tầng dưới (cùng vị trí thật,
+// khác tầng) nên khoảng cách Euclid giữa chúng gần như bằng 0 - không phản ánh đúng công sức
+// thực tế của việc đổi tầng (đi tới thang máy, chờ, di chuyển...). Cộng thêm 1 mức phí cố định
+// cho mọi cạnh đổi tầng để thuật toán không chọn bừa giữa "đi thẳng" và "lên tầng rồi xuống lại".
+const ELEVATOR_FLOOR_CHANGE_COST = 80;
 HOSPITAL_MAP.edges.forEach((e) => {
-  const w = e.weight != null ? e.weight : euclideanDistance(nodeById[e.from], nodeById[e.to]);
+  let w = e.weight != null ? e.weight : euclideanDistance(nodeById[e.from], nodeById[e.to]);
+  if (e.isElevator) w += ELEVATOR_FLOOR_CHANGE_COST;
   adjacency[e.from].push({ to: e.to, weight: w, isElevator: !!e.isElevator, instruction: e.instruction, icon: e.icon });
   adjacency[e.to].push({ to: e.from, weight: w, isElevator: !!e.isElevator, instruction: e.instruction, icon: e.icon });
 });

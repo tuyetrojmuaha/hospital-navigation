@@ -533,6 +533,7 @@ const HOSPITAL_MAP = {
     { from: "B08_SANHA", to: "B08_SANHCHINH" },
     { from: "B08_SANHB", to: "P_G40" },
     { from: "B08_SANHB", to: "B08_KHAMB" },
+    { from: "B08_SANHB", to: "B08_SANHC" },
     { from: "B08_SANHC", to: "P_G22" },
     { from: "B08_SANHC", to: "B08_KHAMA" },    { from: "B12_CUA1", to: "P_G48" },
     { from: "B12_CUA2", to: "P_G45" },
