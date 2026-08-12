@@ -43,10 +43,10 @@ const MAP_IMAGE = {
 const HOSPITAL_MAP = {
   nodes: [
     // ----- CỔNG RA VÀO (mốc quét QR khi vừa vào viện) -----
-    { id: "G_1A", name: "Cổng 1A",         x: 520, y: 221, floor: 1, isGate: true },
-    { id: "G_1B", name: "Cổng 1B",         x: 370, y: 234, floor: 1, isGate: true },
-    { id: "G_CC", name: "Cổng Cấp cứu",    x: 100, y: 480, floor: 1, isGate: true },
-    { id: "G_5",  name: "Cổng số 5",       x: 120, y: 1025, floor: 1, isGate: true },
+    { id: "G_1A", name: "Cổng 1A",         x: 527, y: 388, floor: 1, isGate: true },
+    { id: "G_1B", name: "Cổng 1B",         x: 350, y: 330, floor: 1, isGate: true },
+    { id: "G_CC", name: "Cổng Cấp cứu",    x: 112, y: 486, floor: 1, isGate: true },
+    { id: "G_5",  name: "Cổng số 5",       x: 124, y: 1030, floor: 1, isGate: true },
 
     // ----- 16 KHU NHÀ (toạ độ đo theo ảnh 1000x1298) -----
     // Toạ độ đã dịch nhẹ (~16px) về phía lối đi/waypoint kết nối gần nhất, để gần với
@@ -211,6 +211,7 @@ const HOSPITAL_MAP = {
     // Điểm bổ sung: vòng qua góc phải hàng cây dài gần Nhà thể thao đa năng (B14),
     // tránh cắt thẳng qua bồn cây như trước.
     { id: "P_G55", name: "Lối đi", x: 610, y: 700, floor: 1, isWaypoint: true },
+    { id: "B_XEMAY", name: "Nhà để xe máy", x: 317, y: 311, floor: 1, isDestination: true },
     { id: "B01_CUA1", name: "Lối vào 1 (Nhà N1A)", x: 310, y: 388, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B12_CUA1", name: "Lối vào 1 (Nhà để xe nhân viên)", x: 150, y: 1004, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B12_CUA2", name: "Lối vào 2 (Nhà để xe nhân viên)", x: 179, y: 941, floor: 1, isDestination: true, isTransitPoint: true },
@@ -488,11 +489,11 @@ const HOSPITAL_MAP = {
     { from: "P_G49", to: "P_G47" },
 
     // ===== NOI KHU NHA/CONG/HANH LANG TOI DIEM MAT BANG MOI GAN NHAT =====
-    { from: "G_1A", to: "P_G2" },
     { from: "G_1A", to: "P_G8" },
-    { from: "G_1B", to: "P_G1" },
+    { from: "G_1B", to: "P_G3" },
     { from: "G_CC", to: "P_G19" },
     { from: "G_5", to: "P_G48" },
+    { from: "B_XEMAY", to: "P_G1" },
     { from: "B01", to: "P_G6" },
     { from: "B02", to: "P_G4" },
     { from: "B03", to: "P_G13" },
@@ -626,6 +627,7 @@ const BUILDING_DIRECTORY = {
     { floor: 6, desc: "Khoa Bệnh lây đường máu" },
   ],
   B12: [{ floor: null, desc: "Nhà để xe nhân viên" }],
+  B_XEMAY: [{ floor: null, desc: "Nhà để xe máy", nodeId: "B_XEMAY" }],
   B13: [{ floor: null, desc: "Lối vào Nhà lưu trú", nodeId: "B13_LOIVAO" }],
   B14: [{ floor: null, desc: "Nhà thể thao đa năng" }],
   B15: [{ floor: null, desc: "Nhà thể thao đa năng" }],
