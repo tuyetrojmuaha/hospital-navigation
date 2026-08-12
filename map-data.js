@@ -192,7 +192,7 @@ const HOSPITAL_MAP = {
     { id: "P_G33", name: "Lối đi", x: 497, y: 707, floor: 1, isWaypoint: true },
     { id: "P_G34", name: "Lối đi", x: 360, y: 730, floor: 1, isWaypoint: true },
     { id: "P_G35", name: "Lối đi", x: 392, y: 730, floor: 1, isWaypoint: true },
-    { id: "P_G36", name: "Lối đi gần Nhà Chỉ huy cơ quan", x: 393, y: 750, floor: 1, isWaypoint: true, isQRPoint: true },
+    { id: "P_G36", name: "Lối đi gần Nhà Chỉ huy cơ quan", x: 395, y: 710, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G37", name: "Lối đi", x: 358, y: 773, floor: 1, isWaypoint: true },
     { id: "P_G38", name: "Lối đi", x: 358, y: 802, floor: 1, isWaypoint: true },
     { id: "P_G39", name: "Lối đi", x: 374, y: 802, floor: 1, isWaypoint: true },
