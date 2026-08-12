@@ -616,7 +616,7 @@ const BUILDING_DIRECTORY = {
     { floor: null, desc: "Viện Bảo vệ, chăm sóc sức khoẻ cán bộ Trung ương" },
   ],
   B10: [
-    { floor: null, desc: "Sảnh A - Ban Giám đốc", nodeId: "B10_SANHA" },
+    //{ floor: null, desc: "Sảnh A - Ban Giám đốc", nodeId: "B10_SANHA" },
     { floor: null, desc: "Sảnh B - Khối cơ quan", nodeId: "B10_SANHB" },
   ],
   B11: [
