@@ -304,7 +304,7 @@ const HOSPITAL_MAP = {
     { from: "B08", to: "B08_SANHCHINH" },
     // (3 cầu nối cũ B08_SANHCHINH/CAPCUU/NOIKHOA -> P_G86/101/128 đã được thay bằng kết nối
     // mới tới mạng lưới P_G v2 ở block "NOI KHU NHA/CONG/HANH LANG..." bên dưới)
-    { from: "B10_SANHA", to: "B10_SANHB" },
+    //{ from: "B10_SANHA", to: "B10_SANHB" },
     { from: "B10", to: "B10_SANHA" },
     { from: "B13", to: "B13_LOIVAO" },
     // (Đã xoá 6 cạnh của hành lang Tầng 1 cũ - xem ghi chú ở phần khai báo node phía trên)
