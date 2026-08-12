@@ -544,8 +544,9 @@ const HOSPITAL_MAP = {
     { from: "B15", to: "P_G33" },
     { from: "B16", to: "P_G51" },
     { from: "B08_SANHCHINH", to: "P_G30" },
-    { from: "B08_CAPCUU", to: "P_G26" },
-    { from: "B08_NOIKHOA", to: "P_G30" },
+    // (Đã xoá 5 cạnh "tắt" nối thẳng điểm nội bộ ra mặt bằng ngoài trời, bỏ qua Sảnh A/B/C -
+    // đây chính là nguyên nhân khiến đường đi cắt xuyên qua nhà 08 thay vì đi vào đúng cửa.
+    // Giờ MỌI lộ trình vào nhà 08 bắt buộc phải qua 1 trong 3 Sảnh trước.)
 
     // ===== NOI THANG cho cac diem co cua/loi vao rieng (tranh phai vong qua node cha) =====
     // Phát hiện qua phản hồi thực tế: Sảnh A của B10 nằm xa B10 nên đi vòng xuống B10 trước
@@ -553,9 +554,7 @@ const HOSPITAL_MAP = {
     { from: "B10_SANHA", to: "P_G33" },
     { from: "B10_SANHB", to: "P_G36" },
     { from: "B13_LOIVAO", to: "P_G45" },
-    { from: "B08_KHAMA", to: "P_G23" },
-    { from: "B08_TM_CANLAMSANG", to: "P_G26" },
-    { from: "B08_KHAMB", to: "P_G41" },
+    // (Đã xoá cạnh tắt KHAMA->P_G23, TM_CANLAMSANG->P_G26, KHAMB->P_G41 - xem ghi chú ở trên)
   ],
 };
 
