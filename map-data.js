@@ -60,7 +60,7 @@ const HOSPITAL_MAP = {
     { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 609, y: 422,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B08", name: "Tòa Tháp đôi",                          x: 220, y: 675,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 466, y: 642,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 475, y: 757,  floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 495, y: 740,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B11", name: "Viện Lâm sàng các bệnh truyền nhiễm",  x: 299, y: 920,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B12", name: "Nhà để xe nhân viên",                   x: 176, y: 970,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B13", name: "Nhà lưu trữ",                           x: 160, y: 860,  floor: 1, isDestination: true, isTransitPoint: true },
