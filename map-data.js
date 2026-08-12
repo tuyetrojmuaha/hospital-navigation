@@ -266,8 +266,8 @@ const HOSPITAL_MAP = {
     { id: "B08_TM_NOIKHOA", name: "Thang máy Nhà Nội khoa (Toà Tháp đôi)", x: 200, y: 705, floor: 1, isDestination: true, isTransitPoint: true },
 
     // ===== B10 (Nha Chi huy co quan) - 2 sanh rieng =====
-    { id: "B10_SANHB", name: "Sảnh B (Nhà Chỉ huy cơ quan)", x: 445, y: 750, floor: 1, isDestination: true },
-    { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 497, y: 726, floor: 1, isDestination: true },
+    //{ id: "B10_SANHB", name: "Sảnh B (Nhà Chỉ huy cơ quan)", x: 445, y: 750, floor: 1, isDestination: true },
+    { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 495, y: 720, floor: 1, isDestination: true },
 
     // ===== B13 - loi vao cu the =====
     { id: "B13_LOIVAO", name: "Lối vào Nhà lưu trú", x: 164, y: 916, floor: 1, isDestination: true },
@@ -556,7 +556,7 @@ const HOSPITAL_MAP = {
     // Phát hiện qua phản hồi thực tế: Sảnh A của B10 nằm xa B10 nên đi vòng xuống B10 trước
     // khi ra ngoài — giờ nối thẳng từng điểm tới đúng lối đi mặt bằng gần NÓ nhất.
     { from: "B10_SANHA", to: "P_G33" },
-    { from: "B10_SANHB", to: "P_G36" },
+    //{ from: "B10_SANHB", to: "P_G36" },
     { from: "B13_LOIVAO", to: "P_G45" },
     // (Đã xoá cạnh tắt KHAMA->P_G23, TM_CANLAMSANG->P_G26, KHAMB->P_G41 - xem ghi chú ở trên)
   ],
@@ -620,8 +620,8 @@ const BUILDING_DIRECTORY = {
     { floor: null, desc: "Viện Bảo vệ, chăm sóc sức khoẻ cán bộ Trung ương" },
   ],
   B10: [
-    { floor: null, desc: "Sảnh A - Ban Giám đốc", nodeId: "B10_SANHA" },
-    { floor: null, desc: "Sảnh B - Khối cơ quan", nodeId: "B10_SANHB" },
+    { floor: null, desc: "Sảnh A - Khối cơ quan", nodeId: "B10_SANHA" },
+    //{ floor: null, desc: "Sảnh B - Khối cơ quan", nodeId: "B10_SANHB" },
   ],
   B11: [
     { floor: 1, desc: "Khu khám bệnh truyền nhiễm" },
