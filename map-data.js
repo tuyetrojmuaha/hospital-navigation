@@ -60,10 +60,10 @@ const HOSPITAL_MAP = {
     { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 609, y: 422,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B08", name: "Tòa Tháp đôi",                          x: 220, y: 675,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 466, y: 642,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 495, y: 723,  floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 475, y: 757,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B11", name: "Viện Lâm sàng các bệnh truyền nhiễm",  x: 299, y: 920,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B12", name: "Nhà để xe nhân viên",                   x: 176, y: 970,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B13", name: "Nhà lưu trú",                           x: 160, y: 860,  floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B13", name: "Nhà lưu trữ",                           x: 160, y: 860,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 595, y: 656,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 595, y: 745,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B16", name: "Nhà tang lễ",                           x: 353, y: 1129, floor: 1, isDestination: true, isTransitPoint: true },
@@ -73,20 +73,20 @@ const HOSPITAL_MAP = {
     // toàn bởi 5 điểm chức năng thật ở khối "B01 (Nhà N1A) - TANG 1" bên dưới. Node cũ để sót
     // lại từng gây lỗi: đường đi bị vòng lên Tầng 2 rồi quay lại Tầng 1 một cách vô lý.)
     { id: "B01_F2_1", name: "Hành lang Tầng 2", x: 256, y: 400, floor: 2, isWaypoint: true },
-    { id: "B01_F2_2", name: "Hành lang Tầng 2", x: 276, y: 400, floor: 2, isWaypoint: true },
-    { id: "B01_F2_3", name: "Hành lang Tầng 2", x: 294, y: 400, floor: 2, isWaypoint: true },
-    { id: "B01_F2_4", name: "Hành lang Tầng 2", x: 311, y: 400, floor: 2, isWaypoint: true },
-    { id: "B01_F2_5", name: "Hành lang Tầng 2", x: 326, y: 400, floor: 2, isWaypoint: true },
+    { id: "B01_F2_2", name: "Hành lang Tầng 2", x: 276, y: 399, floor: 2, isWaypoint: true },
+    { id: "B01_F2_3", name: "Hành lang Tầng 2", x: 294, y: 398, floor: 2, isWaypoint: true },
+    { id: "B01_F2_4", name: "Hành lang Tầng 2", x: 311, y: 399, floor: 2, isWaypoint: true },
+    { id: "B01_F2_5", name: "Hành lang Tầng 2", x: 326, y: 398, floor: 2, isWaypoint: true },
     { id: "B01_F3_1", name: "Hành lang Tầng 3", x: 256, y: 400, floor: 3, isWaypoint: true },
-    { id: "B01_F3_2", name: "Hành lang Tầng 3", x: 276, y: 400, floor: 3, isWaypoint: true },
-    { id: "B01_F3_3", name: "Hành lang Tầng 3", x: 294, y: 400, floor: 3, isWaypoint: true },
-    { id: "B01_F3_4", name: "Hành lang Tầng 3", x: 311, y: 400, floor: 3, isWaypoint: true },
-    { id: "B01_F3_5", name: "Hành lang Tầng 3", x: 326, y: 400, floor: 3, isWaypoint: true },
+    { id: "B01_F3_2", name: "Hành lang Tầng 3", x: 276, y: 399, floor: 3, isWaypoint: true },
+    { id: "B01_F3_3", name: "Hành lang Tầng 3", x: 294, y: 398, floor: 3, isWaypoint: true },
+    { id: "B01_F3_4", name: "Hành lang Tầng 3", x: 311, y: 399, floor: 3, isWaypoint: true },
+    { id: "B01_F3_5", name: "Hành lang Tầng 3", x: 326, y: 398, floor: 3, isWaypoint: true },
     { id: "B01_F4_1", name: "Hành lang Tầng 4", x: 256, y: 400, floor: 4, isWaypoint: true },
-    { id: "B01_F4_2", name: "Hành lang Tầng 4", x: 276, y: 400, floor: 4, isWaypoint: true },
-    { id: "B01_F4_3", name: "Hành lang Tầng 4", x: 294, y: 400, floor: 4, isWaypoint: true },
-    { id: "B01_F4_4", name: "Hành lang Tầng 4", x: 311, y: 400, floor: 4, isWaypoint: true },
-    { id: "B01_F4_5", name: "Hành lang Tầng 4", x: 326, y: 400, floor: 4, isWaypoint: true },
+    { id: "B01_F4_2", name: "Hành lang Tầng 4", x: 276, y: 399, floor: 4, isWaypoint: true },
+    { id: "B01_F4_3", name: "Hành lang Tầng 4", x: 294, y: 398, floor: 4, isWaypoint: true },
+    { id: "B01_F4_4", name: "Hành lang Tầng 4", x: 311, y: 399, floor: 4, isWaypoint: true },
+    { id: "B01_F4_5", name: "Hành lang Tầng 4", x: 326, y: 398, floor: 4, isWaypoint: true },
 
     // ----- HANH LANG NOI THAT B02 (Nhà N1B) - lap lai o ca 4 tang -----
     { id: "B02_F2_1", name: "Hành lang Tầng 2", x: 400, y: 397, floor: 2, isWaypoint: true },
@@ -111,15 +111,15 @@ const HOSPITAL_MAP = {
     // ----- HANH LANG NOI THAT B03 (Nhà N2A) - lap lai o ca 4 tang -----
     { id: "B03_F2_1", name: "Hành lang Tầng 2", x: 355, y: 412, floor: 2, isWaypoint: true },
     { id: "B03_F2_2", name: "Hành lang Tầng 2", x: 350, y: 428, floor: 2, isWaypoint: true },
-    { id: "B03_F2_3", name: "Hành lang Tầng 2", x: 355, y: 442, floor: 2, isWaypoint: true },
+    { id: "B03_F2_3", name: "Hành lang Tầng 2", x: 356, y: 442, floor: 2, isWaypoint: true },
     { id: "B03_F2_4", name: "Hành lang Tầng 2", x: 355, y: 462, floor: 2, isWaypoint: true },
     { id: "B03_F3_1", name: "Hành lang Tầng 3", x: 355, y: 412, floor: 3, isWaypoint: true },
     { id: "B03_F3_2", name: "Hành lang Tầng 3", x: 350, y: 428, floor: 3, isWaypoint: true },
-    { id: "B03_F3_3", name: "Hành lang Tầng 3", x: 355, y: 442, floor: 3, isWaypoint: true },
+    { id: "B03_F3_3", name: "Hành lang Tầng 3", x: 356, y: 442, floor: 3, isWaypoint: true },
     { id: "B03_F3_4", name: "Hành lang Tầng 3", x: 355, y: 462, floor: 3, isWaypoint: true },
     { id: "B03_F4_1", name: "Hành lang Tầng 4", x: 355, y: 412, floor: 4, isWaypoint: true },
     { id: "B03_F4_2", name: "Hành lang Tầng 4", x: 350, y: 428, floor: 4, isWaypoint: true },
-    { id: "B03_F4_3", name: "Hành lang Tầng 4", x: 355, y: 442, floor: 4, isWaypoint: true },
+    { id: "B03_F4_3", name: "Hành lang Tầng 4", x: 356, y: 442, floor: 4, isWaypoint: true },
     { id: "B03_F4_4", name: "Hành lang Tầng 4", x: 355, y: 462, floor: 4, isWaypoint: true },
 
     // ----- HANH LANG NOI THAT B06 (Nhà N3) - lap lai o ca 4 tang -----
@@ -129,14 +129,14 @@ const HOSPITAL_MAP = {
     { id: "B06_F2_4", name: "Hành lang Tầng 2", x: 477, y: 506, floor: 2, isWaypoint: true },
     { id: "B06_F2_5", name: "Hành lang Tầng 2", x: 494, y: 506, floor: 2, isWaypoint: true },
     { id: "B06_F2_6", name: "Hành lang Tầng 2", x: 520, y: 506, floor: 2, isWaypoint: true },
-    { id: "B06_F2_7", name: "Hành lang Tầng 2", x: 546, y: 506, floor: 2, isWaypoint: true },
+    { id: "B06_F2_7", name: "Hành lang Tầng 2", x: 546, y: 505, floor: 2, isWaypoint: true },
     { id: "B06_F3_1", name: "Hành lang Tầng 3", x: 414, y: 506, floor: 3, isWaypoint: true },
     { id: "B06_F3_2", name: "Hành lang Tầng 3", x: 436, y: 506, floor: 3, isWaypoint: true },
     { id: "B06_F3_3", name: "Hành lang Tầng 3", x: 459, y: 506, floor: 3, isWaypoint: true },
     { id: "B06_F3_4", name: "Hành lang Tầng 3", x: 477, y: 506, floor: 3, isWaypoint: true },
     { id: "B06_F3_5", name: "Hành lang Tầng 3", x: 494, y: 506, floor: 3, isWaypoint: true },
     { id: "B06_F3_6", name: "Hành lang Tầng 3", x: 520, y: 506, floor: 3, isWaypoint: true },
-    { id: "B06_F3_7", name: "Hành lang Tầng 3", x: 546, y: 506, floor: 3, isWaypoint: true },
+    { id: "B06_F3_7", name: "Hành lang Tầng 3", x: 546, y: 505, floor: 3, isWaypoint: true },
     { id: "B06_F4_1", name: "Hành lang Tầng 4", x: 414, y: 506, floor: 4, isWaypoint: true },
     { id: "B06_F4_2", name: "Hành lang Tầng 4", x: 436, y: 506, floor: 4, isWaypoint: true },
     { id: "B06_F4_3", name: "Hành lang Tầng 4", x: 459, y: 506, floor: 4, isWaypoint: true },
@@ -199,7 +199,7 @@ const HOSPITAL_MAP = {
     { id: "P_G40", name: "Lối đi", x: 182, y: 808, floor: 1, isWaypoint: true },
     { id: "P_G41", name: "Lối đi", x: 204, y: 808, floor: 1, isWaypoint: true },
     { id: "P_G42", name: "Lối đi gần Viện Lâm sàng các bệnh truyền nhiễm", x: 376, y: 890, floor: 1, isWaypoint: true, isQRPoint: true },
-    { id: "P_G43", name: "Lối đi gần Nhà lưu trú", x: 202, y: 895, floor: 1, isWaypoint: true, isQRPoint: true },
+    { id: "P_G43", name: "Lối đi gần Nhà lưu trữ", x: 202, y: 895, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G44", name: "Lối đi gần Viện Lâm sàng các bệnh truyền nhiễm", x: 302, y: 894, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G45", name: "Lối đi", x: 162, y: 926, floor: 1, isWaypoint: true },
     { id: "P_G46", name: "Lối đi gần Nhà để xe nhân viên", x: 200, y: 928, floor: 1, isWaypoint: true, isQRPoint: true },
@@ -235,7 +235,7 @@ const HOSPITAL_MAP = {
     // (Đã bỏ P_G52 - nối thẳng P_G27 tới P_G30 đi sát đúng đỉnh chóp tam giác vườn hoa,
     // không cần điểm trung gian.)
     // ===== B01 (Nhà N1A) - TANG 1: 5 khu chuc nang rieng =====
-    { id: "B01_F1_THUOC", name: "Nhà thuốc số 2 (Nhà N1A, Tầng 1)", x: 257, y: 398, floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B01_F1_THUOC", name: "Nhà thuốc số 2 (Nhà N1A, Tầng 1)", x: 257, y: 399, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_F1_DKKD", name: "Khu đăng ký khám dịch vụ (Nhà N1A, Tầng 1)", x: 294, y: 390, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_F1_BHYT", name: "Khu đăng ký khám BHYT (Nhà N1A, Tầng 1)", x: 311, y: 398, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_F1_HD", name: "Khu hướng dẫn (Nhà N1A, Tầng 1)", x: 327, y: 398, floor: 1, isDestination: true, isTransitPoint: true },
@@ -246,7 +246,7 @@ const HOSPITAL_MAP = {
     { id: "B02_F1_MRI", name: "Khu vực Cộng hưởng từ MRI (Nhà N1B, Tầng 1)", x: 400, y: 410, floor: 1, isDestination: true, isTransitPoint: true },
 
     // ===== B03 (Nhà N2A) - moi tang 1 khu duy nhat =====
-    { id: "B03_F1_BHYT", name: "Khu vực cấp phát thuốc BHYT (Nhà N2A, Tầng 1)", x: 337, y: 440, floor: 1, isDestination: true, isTransitPoint: false },
+    { id: "B03_F1_BHYT", name: "Khu vực cấp phát thuốc BHYT (Nhà N2A, Tầng 1)", x: 337, y: 440, floor: 1, isDestination: true, isTransitPoint: true },
 
     // ===== B06 (Nhà N3) - TANG 1 =====
     { id: "B06_F1_XQUANG", name: "Khu vực Xquang, điện tim, siêu âm (Nhà N3, Tầng 1)", x: 521, y: 507, floor: 1, isDestination: true, isTransitPoint: true },
@@ -266,8 +266,8 @@ const HOSPITAL_MAP = {
     { id: "B08_TM_NOIKHOA", name: "Thang máy Nhà Nội khoa (Toà Tháp đôi)", x: 200, y: 705, floor: 1, isDestination: true, isTransitPoint: true },
 
     // ===== B10 (Nha Chi huy co quan) - 2 sanh rieng =====
-    //{ id: "B10_SANHB", name: "Sảnh B (Nhà Chỉ huy cơ quan)", x: 445, y: 750, floor: 1, isDestination: true },
-    { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 495, y: 750, floor: 1, isDestination: true },
+    { id: "B10_SANHB", name: "Sảnh B (Nhà Chỉ huy cơ quan)", x: 445, y: 750, floor: 1, isDestination: true },
+    { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 497, y: 726, floor: 1, isDestination: true },
 
     // ===== B13 - loi vao cu the =====
     { id: "B13_LOIVAO", name: "Lối vào Nhà lưu trú", x: 164, y: 916, floor: 1, isDestination: true },
@@ -544,7 +544,11 @@ const HOSPITAL_MAP = {
     { from: "B15", to: "P_G33" },
     { from: "B16", to: "P_G51" },
     { from: "B08_SANHCHINH", to: "P_G30" },
-    // (Đã xoá 5 cạnh "tắt" nối thẳng điểm nội bộ ra mặt bằng ngoài trời, bỏ qua Sảnh A/B/C -
+    // Khu Cấp cứu có CỬA RIÊNG thẳng ra ngoài (giống lối cấp cứu thật ở bệnh viện, không đi
+    // qua Sảnh chính) - khác với Khu khám A/B, Nội khoa, Cận lâm sàng là các điểm sâu bên
+    // trong thật sự, bắt buộc phải qua 1 trong 3 Sảnh trước.
+    { from: "B08_CAPCUU", to: "P_G26" },
+    // (Đã xoá 4 cạnh "tắt" còn lại nối thẳng điểm nội bộ ra mặt bằng ngoài trời, bỏ qua Sảnh A/B/C -
     // đây chính là nguyên nhân khiến đường đi cắt xuyên qua nhà 08 thay vì đi vào đúng cửa.
     // Giờ MỌI lộ trình vào nhà 08 bắt buộc phải qua 1 trong 3 Sảnh trước.)
 
@@ -616,7 +620,7 @@ const BUILDING_DIRECTORY = {
     { floor: null, desc: "Viện Bảo vệ, chăm sóc sức khoẻ cán bộ Trung ương" },
   ],
   B10: [
-    //{ floor: null, desc: "Sảnh A - Ban Giám đốc", nodeId: "B10_SANHA" },
+    { floor: null, desc: "Sảnh A - Ban Giám đốc", nodeId: "B10_SANHA" },
     { floor: null, desc: "Sảnh B - Khối cơ quan", nodeId: "B10_SANHB" },
   ],
   B11: [
