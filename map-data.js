@@ -63,7 +63,7 @@ const HOSPITAL_MAP = {
     { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 496, y: 747,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B11", name: "Viện Lâm sàng các bệnh truyền nhiễm",  x: 299, y: 920,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B12", name: "Nhà để xe nhân viên",                   x: 176, y: 970,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B13", name: "Nhà lưu trú",                           x: 160, y: 860,  floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B13", name: "Nhà lưu trú",                           x: 165, y: 904,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 618, y: 634,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 588, y: 750,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B16", name: "Nhà tang lễ",                           x: 353, y: 1129, floor: 1, isDestination: true, isTransitPoint: true },
@@ -318,6 +318,8 @@ const HOSPITAL_MAP = {
     // mới tới mạng lưới P_G v2 ở block "NOI KHU NHA/CONG/HANH LANG..." bên dưới)
     // (Đã xoá cạnh Sảnh A - Sảnh B do Sảnh B không còn tồn tại)
     { from: "B10", to: "B10_SANHA" },
+	
+	{ from: "B13_LOIVAO", to: "B13" },
     // (Đã xoá 6 cạnh của hành lang Tầng 1 cũ - xem ghi chú ở phần khai báo node phía trên)
     { from: "B01_F2_1", to: "B01_F2_2" },
     { from: "B01_F2_2", to: "B01_F2_3" },
