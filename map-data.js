@@ -60,7 +60,7 @@ const HOSPITAL_MAP = {
     { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 609, y: 422,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B08", name: "Tòa Tháp đôi",                          x: 220, y: 675,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 466, y: 642,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 495, y: 740,  floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 475, y: 757,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B11", name: "Viện Lâm sàng các bệnh truyền nhiễm",  x: 299, y: 920,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B12", name: "Nhà để xe nhân viên",                   x: 176, y: 970,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B13", name: "Nhà lưu trữ",                           x: 160, y: 860,  floor: 1, isDestination: true, isTransitPoint: true },
@@ -192,7 +192,7 @@ const HOSPITAL_MAP = {
     { id: "P_G33", name: "Lối đi", x: 497, y: 707, floor: 1, isWaypoint: true },
     { id: "P_G34", name: "Lối đi", x: 360, y: 730, floor: 1, isWaypoint: true },
     { id: "P_G35", name: "Lối đi", x: 392, y: 730, floor: 1, isWaypoint: true },
-    { id: "P_G36", name: "Lối đi gần Nhà Chỉ huy cơ quan", x: 395, y: 710, floor: 1, isWaypoint: true, isQRPoint: true },
+    { id: "P_G36", name: "Lối đi gần Nhà Chỉ huy cơ quan", x: 439, y: 754, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G37", name: "Lối đi", x: 358, y: 773, floor: 1, isWaypoint: true },
     { id: "P_G38", name: "Lối đi", x: 358, y: 802, floor: 1, isWaypoint: true },
     { id: "P_G39", name: "Lối đi", x: 374, y: 802, floor: 1, isWaypoint: true },
@@ -266,8 +266,8 @@ const HOSPITAL_MAP = {
     { id: "B08_TM_NOIKHOA", name: "Thang máy Nhà Nội khoa (Toà Tháp đôi)", x: 200, y: 705, floor: 1, isDestination: true, isTransitPoint: true },
 
     // ===== B10 (Nha Chi huy co quan) - 2 sanh rieng =====
-    //{ id: "B10_SANHB", name: "Sảnh B (Nhà Chỉ huy cơ quan)", x: 445, y: 750, floor: 1, isDestination: true },
-    { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 495, y: 720, floor: 1, isDestination: true },
+    // (Đã bỏ Sảnh B - Nhà Chỉ huy cơ quan theo yêu cầu)
+    { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 497, y: 726, floor: 1, isDestination: true },
 
     // ===== B13 - loi vao cu the =====
     { id: "B13_LOIVAO", name: "Lối vào Nhà lưu trú", x: 164, y: 916, floor: 1, isDestination: true },
@@ -304,7 +304,7 @@ const HOSPITAL_MAP = {
     { from: "B08", to: "B08_SANHCHINH" },
     // (3 cầu nối cũ B08_SANHCHINH/CAPCUU/NOIKHOA -> P_G86/101/128 đã được thay bằng kết nối
     // mới tới mạng lưới P_G v2 ở block "NOI KHU NHA/CONG/HANH LANG..." bên dưới)
-    //{ from: "B10_SANHA", to: "B10_SANHB" },
+    // (Đã xoá cạnh Sảnh A - Sảnh B do Sảnh B không còn tồn tại)
     { from: "B10", to: "B10_SANHA" },
     { from: "B13", to: "B13_LOIVAO" },
     // (Đã xoá 6 cạnh của hành lang Tầng 1 cũ - xem ghi chú ở phần khai báo node phía trên)
@@ -556,7 +556,7 @@ const HOSPITAL_MAP = {
     // Phát hiện qua phản hồi thực tế: Sảnh A của B10 nằm xa B10 nên đi vòng xuống B10 trước
     // khi ra ngoài — giờ nối thẳng từng điểm tới đúng lối đi mặt bằng gần NÓ nhất.
     { from: "B10_SANHA", to: "P_G33" },
-    //{ from: "B10_SANHB", to: "P_G36" },
+    // (Đã xoá cạnh Sảnh B -> P_G36 do Sảnh B không còn tồn tại)
     { from: "B13_LOIVAO", to: "P_G45" },
     // (Đã xoá cạnh tắt KHAMA->P_G23, TM_CANLAMSANG->P_G26, KHAMB->P_G41 - xem ghi chú ở trên)
   ],
@@ -620,8 +620,8 @@ const BUILDING_DIRECTORY = {
     { floor: null, desc: "Viện Bảo vệ, chăm sóc sức khoẻ cán bộ Trung ương" },
   ],
   B10: [
-    { floor: null, desc: "Sảnh A - Khối cơ quan", nodeId: "B10_SANHA" },
-    //{ floor: null, desc: "Sảnh B - Khối cơ quan", nodeId: "B10_SANHB" },
+    { floor: null, desc: "Ban Giám đốc", nodeId: "B10_SANHA" },
+    { floor: null, desc: "Khối cơ quan", nodeId: "B10_SANHA" },
   ],
   B11: [
     { floor: 1, desc: "Khu khám bệnh truyền nhiễm" },
