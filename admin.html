@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tạo mã QR - Quản trị</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=fLiYFweah9AjZIDItdcAA9oscSadtI1Umr_SejAMkSwK9U4iwMhwzpaWsHkhdRk32vlzPHfm5BzsDrmrRtEpC2U7jgAcYa73z7jqAdBAs_F5bzDewL2QjXp1alalQm6UM7T8b41UwiO6KhsNzmy3rS--47ITcJ8s2eftzToJRWzGLUXFi4Znb7Um6vSvbFRNgaNy58HZ_4a2oxRb88Xujmw_kH5UQilk8tJoh5O2e4ddri-VpKrKFDp2i7d2tSKFfyd8ks6cPLGL21DquDPa-gKuDwSjCGAXRTqwO6v01_PzfNYg0r4cJMNmP5vrCrd2" charset="UTF-8"></script><style>
     .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; padding: 16px; }
     .qr-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; }
     .qr-card canvas { margin: 0 auto; }
-    .qr-card .qr-name { font-weight: 700; margin-top: 8px; }
-    .qr-card .qr-id { color: #6b7280; font-size: 12px; }
+    .qr-card .qr-instruction { margin-top: 10px; font-size: 13px; font-weight: 700; line-height: 1.35; }
+    .qr-card .qr-name { font-weight: 700; margin-top: 6px; }
     @media print {
       .no-print { display: none; }
       .qr-card { break-inside: avoid; }
@@ -58,17 +58,17 @@
         const canvasHolder = document.createElement("div");
         card.appendChild(canvasHolder);
 
+        const instructionEl = document.createElement("div");
+        instructionEl.className = "qr-instruction";
+        instructionEl.textContent = "Quét mã QR để tìm đường đi trong Bệnh viện";
+        card.appendChild(instructionEl);
+
         const nameEl = document.createElement("div");
         nameEl.className = "qr-name";
-        nameEl.textContent = node.name;
+        nameEl.textContent = `Vị trí hiện tại: ${node.name}`;
         card.appendChild(nameEl);
 
         const link = `${baseUrl}?node=${encodeURIComponent(node.id)}`;
-        const idEl = document.createElement("div");
-        idEl.className = "qr-id";
-        const typeLabel = node.isGate ? "Cổng" : node.isQRPoint ? "Lối đi (nút giao)" : "Đích đến";
-        idEl.textContent = `${node.id} · ${typeLabel}`;
-        card.appendChild(idEl);
 
         grid.appendChild(card);
 
