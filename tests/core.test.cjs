@@ -80,3 +80,57 @@ test('one-way terminal nodes remain valid destinations',()=>{
   const m={nodes:[{id:'A',name:'A',x:1,y:1,floor:1,isGate:true},{id:'B',name:'B',x:2,y:2,floor:1,isDestination:true}],edges:[{from:'A',to:'B',oneWay:true}]};
   const e=api.create(m,{},image);assert.equal(e.findPath('A','B').status,'ok');assert.equal(e.findPath('B','A').status,'unreachable');
 });
+
+test('boolean flags reject strings, numbers, null and explicit undefined',()=>{
+  for(const field of ['isDestination','isGate','isWaypoint','isQRPoint','isTransitPoint','isEntrance','routingEnabled']) {
+    for(const value of ['false','true',0,1,null,undefined]) {
+      const m=clone(map);m.nodes[0][field]=value;
+      assert.throws(()=>api.create(m,directory,image),new RegExp(field));
+    }
+    for(const value of [true,false]) {const m=clone(map);m.nodes[0][field]=value;assert.doesNotThrow(()=>api.create(m,directory,image));}
+  }
+  for(const field of ['oneWay','enabled','isElevator']) {
+    for(const value of ['false','true',0,1,null,undefined]) {
+      const m=clone(map);m.edges[0][field]=value;
+      assert.throws(()=>api.create(m,directory,image),new RegExp(field));
+    }
+    for(const value of [true,false]) {const m=clone(map);m.edges[0][field]=value;assert.doesNotThrow(()=>api.create(m,directory,image));}
+  }
+});
+function curveDirections(angles) {
+  const points=[{x:500,y:600}];
+  for(const angle of angles){const p=points.at(-1);points.push({x:p.x+20*Math.cos(angle*Math.PI/180),y:p.y+20*Math.sin(angle*Math.PI/180)});}
+  const m={nodes:points.map((p,i)=>({id:'N'+i,name:'Điểm '+i,...p,floor:1,isWaypoint:true})),edges:points.slice(1).map((_,i)=>({from:'N'+i,to:'N'+(i+1)}))};
+  const e=api.create(m,{},image);
+  return e.directions(e.findPath('N0','N'+(points.length-1)),{desc:'Đích'}).map(x=>x.text).join('\n');
+}
+test('gradual bends are announced in both directions, including angle wraparound',()=>{
+  assert.match(curveDirections([0,30,60,90]),/cong sang phải/);
+  assert.match(curveDirections([0,-30,-60,-90]),/cong sang trái/);
+  assert.match(curveDirections([160,-170,-140]),/cong sang phải/);
+});
+test('small alternating noise does not become a curve; sharp local S turn takes priority',()=>{
+  assert.doesNotMatch(curveDirections([0,10,-10,10,0]),/cong|Rẽ|Quay lại/);
+  assert.match(curveDirections([0,30,-30]),/Rẽ trái/);
+  assert.doesNotMatch(curveDirections([0,30,-30]),/cong sang phải/);
+});
+test('current G_1A to Khu kham B route includes its gradual bend',()=>{
+  const destination=engine.destinations.find(d=>d.targetId==='B08_KHAMB');
+  assert.match(engine.directions(engine.findPath('G_1A',destination.targetId),destination).map(x=>x.text).join('\n'),/cong sang/);
+});
+test('independent Floyd-Warshall agrees with all supported route costs',()=>{
+  const ids=[...engine.nodes.keys()],index=new Map(ids.map((id,i)=>[id,i]));
+  const costs=ids.map((_,i)=>ids.map((_,j)=>i===j?0:Infinity));
+  for(const [from,edges] of engine.adjacency) for(const edge of edges)costs[index.get(from)][index.get(edge.to)]=edge.weight;
+  for(let k=0;k<ids.length;k++){
+    if(!engine.canTransit(ids[k]))continue;
+    for(let i=0;i<ids.length;i++){
+      if(!Number.isFinite(costs[i][k]))continue;
+      for(let j=0;j<ids.length;j++)costs[i][j]=Math.min(costs[i][j],costs[i][k]+costs[k][j]);
+    }
+  }
+  for(const s of engine.qrNodes)for(const d of engine.destinations.filter(d=>engine.isSupported(d.targetId))) {
+    const result=engine.findPath(s.id,d.targetId);
+    assert.ok(Math.abs(result.cost-costs[index.get(s.id)][index.get(d.targetId)])<1e-8,s.id+' -> '+d.targetId);
+  }
+});

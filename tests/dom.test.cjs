@@ -36,11 +36,23 @@ async function open(file,search='',omit=''){
  console.log('PASS upper-floor initial tab and descending directions');
  x=await open('index.html','','map-data.js');assert.equal(x.d.querySelector('#boot-status').hidden,false);assert.match(x.d.querySelector('#boot-status').textContent,/Không thể tải/);x.dom.window.close();
  console.log('PASS missing-data user-visible failure');
+ x=await open('index.html','?node=G_1A');({w,d}=x);
+ await until(()=>!d.querySelector('.map-container').hidden);
+ d.querySelector('#destination-search').value='cap cuu';d.querySelector('#destination-search').dispatchEvent(new w.Event('input'));d.querySelector('.dest-btn').click();
+ const background=d.querySelector('#map-background');background.dispatchEvent(new w.Event('error'));
+ assert.equal(d.querySelector('.map-container').hidden,true);assert.equal(d.querySelector('.map-controls').hidden,true);assert.equal(d.querySelector('#image-error').hidden,false);
+ d.querySelector('#btn-back-to-destinations').click();d.querySelector('.dest-btn').click();
+ assert.equal(d.querySelector('.map-container').hidden,true,'route selection must not show lines without background');
+ background.dispatchEvent(new w.Event('load'));
+ assert.equal(d.querySelector('.map-container').hidden,false);assert.equal(d.querySelector('.map-controls').hidden,false);assert.equal(d.querySelector('#image-error').hidden,true);
+ assert.equal(x.errors.length,0);x.dom.window.close();
+ console.log('PASS image failure hides map and zoom controls; changing destination stays hidden; image recovery restores map');
+
  x=await open('admin.html');({w,d}=x);assert.equal(d.querySelector('#base-url-input').value,'https://example.org/index.html');assert.equal(d.querySelectorAll('#qr-location-select option').length,72);
  d.querySelector('#base-url-input').value='https://example.org/index.html?lang=vi#map';d.querySelector('#btn-generate').click();await until(()=>!d.querySelector('#btn-print').disabled || !d.querySelector('#qr-error').hidden);
  assert.equal(d.querySelector('#qr-error').hidden,true,d.querySelector('#qr-error').textContent);assert.equal(d.querySelectorAll('.qr-card').length,71);
- assert.equal(d.querySelectorAll('.qr-card img').length,71);const url=new URL(d.querySelector('.qr-meta a').href);assert.equal(url.searchParams.get('lang'),'vi');assert.equal(url.searchParams.get('node'),'G_1A');assert.equal(url.hash,'');
- for (const e of d.querySelectorAll('.qr-card')){assert.equal(e.querySelector('.qr-instruction').textContent,'Quét mã QR để tìm đường đi trong Bệnh viện');assert.ok(e.querySelector('.qr-meta').classList.contains('no-print'))}
+ assert.equal(d.querySelectorAll('.qr-card img').length,71);
+ for (const e of d.querySelectorAll('.qr-card')){assert.equal(e.querySelector('.qr-instruction').textContent,'Quét mã QR để tìm đường đi trong Bệnh viện');assert.equal(e.querySelectorAll('.qr-meta, a').length,0)}
  const image=d.querySelector('.qr-card img').src;
  const decodedImage=await loadImage(image), c=createCanvas(280,280), ctx=c.getContext('2d');
  ctx.fillStyle='white';ctx.fillRect(0,0,280,280);ctx.drawImage(decodedImage,20,20);
