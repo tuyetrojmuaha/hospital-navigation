@@ -81,3 +81,9 @@ INDOOR_PLANS hiện để trống và runtime **chưa đọc cấu trúc này**.
 3. Kiểm tra cùng vị trí/đích, QR sai, các khu ngoài phạm vi, tìm kiếm không dấu.
 4. Xác minh ngoài thực địa, rồi mới in QR hoặc đưa bộ dữ liệu mới lên máy chủ.
 5. Tăng phiên bản cache trong cả index.html/admin.html và triển khai đồng bộ.
+
+## Kiểm tra cờ boolean (bản 2026-09-23.2)
+
+Các cờ node `isDestination`, `isGate`, `isWaypoint`, `isQRPoint`, `isTransitPoint`, `isEntrance`, `routingEnabled` và cờ cạnh `oneWay`, `enabled`, `isElevator` chỉ chấp nhận boolean khi có khai báo. Ví dụ `isTransitPoint: false` hợp lệ; `isTransitPoint: "false"` không hợp lệ. Nếu muốn dùng mặc định, bỏ thuộc tính, không gán null/undefined.
+
+Bộ sinh chỉ dẫn cộng các góc đổi hướng liên tiếp để nhận diện đoạn cong vượt ngưỡng 40°. Góc rẽ gấp ở từng điểm ưu tiên hơn góc tích lũy; sau đổi tầng/chỉ dẫn cố định, bộ tích lũy được đặt lại. Các câu này vẫn cần đối chiếu thực địa, không thay thế lời chỉ dẫn khảo sát tại chỗ.

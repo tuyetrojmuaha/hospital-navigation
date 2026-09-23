@@ -24,7 +24,9 @@ input, select { width: 100%; min-height: 48px; padding: 11px; margin: 7px 0 16px
 .notice { background: #fff8e6; border: 1px solid #e1cf9d; border-radius: 9px; padding: 12px; font-size: 14px; }
 #boot-status { max-width: 640px; margin: 24px auto; }
 .destination-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; max-height: 58vh; overflow-y: auto; padding: 4px; }
-.dest-btn { display: flex; flex-direction: column; text-align: left; gap: 3px; }
+/* Cards must retain their content height inside the capped, scrolling flex list. */
+.dest-btn { display: flex; flex: 0 0 auto; flex-direction: column; align-items: stretch; min-width: 0; height: auto; white-space: normal; overflow-wrap: anywhere; text-align: left; gap: 3px; }
+.dest-btn > span { flex: 0 0 auto; min-width: 0; line-height: 1.5; }
 .dest-desc { font-weight: 650; }
 .no-result { padding: 10px; }
 .floor-tabs, .map-controls, .button-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
@@ -47,7 +49,6 @@ input, select { width: 100%; min-height: 48px; padding: 11px; margin: 7px 0 16px
 .qr-canvas canvas, .qr-canvas img { max-width: 100%; height: auto; display: block; margin: auto; }
 .qr-instruction { margin-top: 12px; font-weight: 700; }
 .qr-name { margin-top: 8px; font-weight: 600; }
-.qr-meta { color: #4b5c72; font-size: 13px; margin-top: 10px; overflow-wrap: anywhere; }
 @media (max-width: 370px) { .qr-grid { grid-template-columns: minmax(0, 1fr); } .qr-card { padding: 10px; } }
 @media print {
   @page { size: A4 portrait; margin: 12mm; }

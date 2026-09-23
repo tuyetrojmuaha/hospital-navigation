@@ -1,6 +1,6 @@
 # Chỉ đường trong Bệnh viện
 
-Bản sửa ngày 23/09/2026. Ứng dụng tĩnh, không cần backend hoặc cơ sở dữ liệu.
+Bản sửa ngày 23/09/2026, phiên bản 2026-09-23.4. Ứng dụng tĩnh, không cần backend hoặc cơ sở dữ liệu.
 
 ## Phạm vi đã thống nhất
 
@@ -48,18 +48,18 @@ Không có thao tác đăng nhập hoặc ghi dữ liệu từ admin.html: đây
 
 CSP khai báo trong HTML chỉ cho script/style cục bộ và ảnh cục bộ/data. Không có phân tích hành vi, CDN runtime, script Kaspersky hoặc gửi dữ liệu ra bên ngoài. Nếu quản lý được HTTP headers, cấu hình thêm `X-Content-Type-Options: nosniff` và `Content-Security-Policy: frame-ancestors 'none'` ở máy chủ. Chỉ cấu hình HSTS khi tên miền đã vận hành HTTPS đầy đủ.
 
-Khi cập nhật: tải lên đồng bộ toàn bộ file, tăng chuỗi phiên bản `v=20260923-1` trong cả hai HTML (và APP_CONFIG.release để ghi nhận phiên bản). Nên phục vụ HTML với cache cần tái xác thực để trình duyệt nhận phiên bản mới. Không thêm service worker trong bản này để tránh dữ liệu lối đi cũ bị giữ ngầm. Không cam kết tải lại trang khi mất mạng.
+Khi cập nhật: tải lên đồng bộ toàn bộ file, tăng chuỗi phiên bản `v=20260923-4` trong cả hai HTML (và APP_CONFIG.release để ghi nhận phiên bản). Nên phục vụ HTML với cache cần tái xác thực để trình duyệt nhận phiên bản mới. Không thêm service worker trong bản này để tránh dữ liệu lối đi cũ bị giữ ngầm. Không cam kết tải lại trang khi mất mạng.
 
 ## Tạo và in QR
 
 1. Vào admin.html. Địa chỉ tự lấy index.html cùng thư mục nếu mở trên HTTP(S); khi mở file cục bộ dùng giá trị trong config.js.
 2. Kiểm tra hoặc thay bằng URL HTTPS thật. Có thể giữ query khác; node được thay bằng đúng ID và fragment bị bỏ.
-3. Chọn tất cả hoặc một vị trí. ID/tọa độ trên màn hình giúp phân biệt các vị trí trùng tên.
+3. Chọn tất cả hoặc một vị trí. Mã trong danh sách chọn của trang admin giúp phân biệt các vị trí trùng tên.
 4. Bấm Tạo mã QR, đợi nút In mã đã tạo bật.
 5. Quét thử link bằng điện thoại và kiểm tra vị trí. In A4, tắt header/footer tự thêm của trình duyệt, kiểm tra bản xem trước.
-6. Dán đúng vị trí. Với các điểm có tên trùng, in từng vị trí và đối chiếu ID/tọa độ trước khi dán.
+6. Dán đúng vị trí. Với các điểm có tên trùng, in từng vị trí và đối chiếu vị trí đã chọn với dữ liệu map-data.js trước khi dán.
 
-Bản in chỉ có mã QR, “Quét mã QR để tìm đường đi trong Bệnh viện” và “Vị trí hiện tại: …”. ID/tọa độ và link thử không in ra giấy. Mã có vùng trắng xung quanh; không cắt sát ô vuông QR. Nếu thay tên miền hoặc đổi ID của điểm đã in, phải xử lý chuyển hướng hoặc in lại mã.
+Bản in chỉ có mã QR, “Quét mã QR để tìm đường đi trong Bệnh viện” và “Vị trí hiện tại: …”. Thẻ QR trên màn hình cũng không hiển thị ID/tọa độ hoặc link thử. Mã có vùng trắng xung quanh; không cắt sát ô vuông QR. Nếu thay tên miền hoặc đổi ID của điểm đã in, phải xử lý chuyển hướng hoặc in lại mã.
 
 ## Giới hạn phải xác minh ngoài thực địa
 
@@ -88,3 +88,15 @@ npm run test:dom
 ```
 
 Các gói trong package.json chỉ phục vụ kiểm thử, không được tải bởi trang web. DOM mô phỏng không thay thế kiểm thử bố cục/CSP/bản in trên trình duyệt thật.
+
+## Bản hoàn thiện 2026-09-23.2
+
+- Khi ảnh nền chưa sẵn sàng hoặc lỗi, khung bản đồ và nút zoom được ẩn; chỉ mở lại sau sự kiện tải ảnh thành công. Đổi đích khi ảnh lỗi không làm hiện đường vẽ trên nền trống.
+- Chỉ dẫn xét cả góc tích lũy cho đường cong; góc rẽ gấp tại từng điểm vẫn được ưu tiên, tránh nhầm hướng ở đoạn chữ S.
+- Cờ cấu hình phải là boolean thật, không nhận chuỗi "false"/"true", số, null hoặc undefined khai báo tường minh.
+- Có 14 nhóm kiểm thử lõi, gồm so sánh độc lập chi phí 2.982 tổ hợp bằng Floyd–Warshall.
+- Thay đồng bộ bộ file web trong ZIP khi nâng cấp, vì cả app.js, navigation-core.js và phiên bản URL tải script trong HTML đã thay đổi. Không trộn HTML cũ với JS mới.
+
+## Sửa giao diện 2026-09-23.3
+
+Danh sách đích đến giữ nguyên chiều cao theo nội dung, không co các thẻ khi danh sách dài. Phần chọn vị trí của bệnh nhân chỉ hiện tên, không hiện mã ID. Khi nâng cấp thay style.css, app.js và index.html; bộ ZIP đã cập nhật đồng bộ trang admin và phiên bản tài nguyên. Nếu trình duyệt còn giữ HTML cũ, tải lại bằng Ctrl+F5.

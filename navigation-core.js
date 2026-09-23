@@ -4,8 +4,9 @@
   const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().replace(/\s+/g, ' ').trim();
   const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   const bearing = (a, b) => Math.atan2(b.y - a.y, b.x - a.x);
+  const angleDelta = (previous, next) => ((next - previous) * 180 / Math.PI + 540) % 360 - 180;
   function turnLabel(previous, next) {
-    const angle = ((next - previous) * 180 / Math.PI + 540) % 360 - 180;
+    const angle = angleDelta(previous, next);
     if (Math.abs(angle) < 40) return 'Đi thẳng';
     if (Math.abs(angle) >= 150) return 'Quay lại';
     return angle > 0 ? 'Rẽ phải' : 'Rẽ trái'; // SVG/image coordinates: Y increases downwards.
@@ -20,10 +21,16 @@
   function create(map, directory, image) {
     const errors = [], warnings = [];
     const nodes = new Map(), adjacency = new Map(), destinations = [], connected = new Set();
+    const checkFlags = (value, fields, label) => {
+      for (const field of fields) {
+        if (Object.prototype.hasOwnProperty.call(value, field) && typeof value[field] !== 'boolean') errors.push(`${label}: ${field} phải là boolean true/false.`);
+      }
+    };
     if (!map || !Array.isArray(map.nodes) || !Array.isArray(map.edges)) throw new Error('Thiếu dữ liệu nodes/edges.');
     if (!image || !Number.isFinite(image.width) || image.width <= 0 || !Number.isFinite(image.height) || image.height <= 0 || typeof image.src !== 'string' || !image.src) errors.push('Ảnh bản đồ không hợp lệ.');
     for (const node of map.nodes) {
       if (!node || typeof node.id !== 'string' || !/^[A-Za-z0-9_-]+$/.test(node.id) || nodes.has(node.id)) { errors.push('ID điểm trống, trùng hoặc không hợp lệ: ' + node?.id); continue; }
+      checkFlags(node, ['isDestination', 'isGate', 'isWaypoint', 'isQRPoint', 'isTransitPoint', 'isEntrance', 'routingEnabled'], 'Điểm ' + node.id);
       if (typeof node.name !== 'string' || !node.name.trim() || !Number.isFinite(node.x) || !Number.isFinite(node.y) || !Number.isInteger(node.floor) || node.floor < 1) errors.push('Tên/tọa độ/tầng không hợp lệ: ' + node.id);
       if (image && (node.x < 0 || node.y < 0 || node.x > image.width || node.y > image.height)) errors.push('Điểm nằm ngoài ảnh: ' + node.id);
       nodes.set(node.id, node); adjacency.set(node.id, []);
@@ -31,6 +38,7 @@
     const edgeKeys = new Set();
     for (const edge of map.edges) {
       if (!edge || !nodes.has(edge.from) || !nodes.has(edge.to)) { errors.push('Cạnh tham chiếu điểm không tồn tại: ' + JSON.stringify(edge)); continue; }
+      checkFlags(edge, ['oneWay', 'enabled', 'isElevator'], 'Cạnh ' + edge.from + ' → ' + edge.to);
       const a = nodes.get(edge.from), b = nodes.get(edge.to);
       if (edge.kind != null && !['walk', 'stairs', 'elevator', 'vertical'].includes(edge.kind)) { errors.push('Loại cạnh không hợp lệ: ' + edge.kind); continue; }
       if (['instruction', 'reverseInstruction'].some(key => edge[key] != null && typeof edge[key] !== 'string')) { errors.push('Chỉ dẫn cạnh phải là chuỗi: ' + edge.from); continue; }
@@ -94,7 +102,7 @@
       if (result.status === 'same') return [{icon: '📍', text: destination.floor && destination.floor !== nodes.get(result.end).floor ? `Bạn đang ở ${destination.buildingName}. Hãy hỏi nhân viên hướng dẫn đến Tầng ${destination.floor}: ${destination.desc}.` : `Vị trí đã chọn trùng với đích: ${destination.desc}.`}];
       if (result.status !== 'ok') return [];
       const output = [{icon: '📍', text: 'Từ ' + nodes.get(result.start).name + ', đi theo đường được tô trên sơ đồ. Đối chiếu biển chỉ dẫn tại chỗ để xác định hướng ban đầu.'}];
-      let prev = null, pending = null;
+      let prev = null, accumulatedTurn = 0, pending = null;
       const flush = () => { if (pending) output.push(pending); pending = null; };
       for (const step of result.steps) {
         const a = nodes.get(step.from), b = nodes.get(step.to);
@@ -102,13 +110,19 @@
           flush();
           const mode = step.kind === 'stairs' ? 'thang bộ' : step.kind === 'elevator' ? 'thang máy' : 'lối chuyển tầng';
           output.push({icon: step.kind === 'stairs' ? '↕️' : '🛗', text: `Đi ${mode} ${b.floor > a.floor ? 'lên' : 'xuống'} Tầng ${b.floor} (từ Tầng ${a.floor}).`});
-          prev = null; continue;
+          prev = null; accumulatedTurn = 0; continue;
         }
-        if (step.instruction) { flush(); output.push({icon: '➡️', text: step.instruction}); prev = null; continue; }
+        if (step.instruction) { flush(); output.push({icon: '➡️', text: step.instruction}); prev = null; accumulatedTurn = 0; continue; }
         if (distance(a, b) < 0.01) continue;
-        const next = bearing(a, b), turn = prev === null ? 'Đi thẳng' : turnLabel(prev, next);
+        const next = bearing(a, b);
+        const localTurn = prev === null ? 'Đi thẳng' : turnLabel(prev, next);
+        if (prev !== null) accumulatedTurn += angleDelta(prev, next);
+        // A sequence of small bends can change heading substantially. Keep its
+        // signed total, but prioritize a sharp local turn (including an S bend).
+        const gradual = localTurn === 'Đi thẳng' && Math.abs(accumulatedTurn) >= 40;
+        const turn = gradual ? (accumulatedTurn > 0 ? 'Theo lối đi cong sang phải' : 'Theo lối đi cong sang trái') : localTurn;
         const label = b.isWaypoint ? '' : ', hướng tới ' + b.name;
-        if (turn !== 'Đi thẳng') { flush(); pending = {icon: turn === 'Rẽ trái' ? '⬅️' : turn === 'Rẽ phải' ? '➡️' : '🔄', text: turn + label}; }
+        if (turn !== 'Đi thẳng') { flush(); pending = {icon: gradual ? (accumulatedTurn > 0 ? '➡️' : '⬅️') : turn === 'Rẽ trái' ? '⬅️' : turn === 'Rẽ phải' ? '➡️' : '🔄', text: turn + label}; accumulatedTurn = 0; }
         else if (pending) { if (label) pending.text = pending.text.split(', hướng tới ')[0] + label; }
         else pending = {icon: '⬆️', text: 'Đi theo lối đi' + label};
         prev = next;

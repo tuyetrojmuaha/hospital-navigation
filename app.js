@@ -108,11 +108,21 @@
     engine = HospitalNavigation.create(HOSPITAL_MAP, BUILDING_DIRECTORY, MAP_IMAGE);
     if (engine.warnings.length) console.warn(engine.warnings.join('\n'));
     const image = $('map-background');
-    image.addEventListener('error', () => { message('image-error', 'Không tải được ảnh sơ đồ. Vui lòng tải lại trang hoặc hỏi nhân viên hỗ trợ.'); $('map-svg').hidden = true; });
-    image.addEventListener('load', () => { message('image-error', ''); $('map-svg').hidden = false; });
+    // Hide the HTML container, not an expando 'hidden' property on SVGElement.
+    // Do not display route lines before the background is ready, including when
+    // users select a different destination while the image is unavailable.
+    const mapContainer = document.querySelector('.map-container');
+    const mapControls = document.querySelector('.map-controls');
+    const setMapVisible = visible => { mapContainer.hidden = !visible; mapControls.hidden = !visible; };
+    setMapVisible(false);
+    image.addEventListener('error', () => {
+      setMapVisible(false);
+      message('image-error', 'Không tải được ảnh sơ đồ. Bản đồ đã được ẩn để tránh hiểu nhầm đường đi. Vui lòng tải lại trang hoặc hỏi nhân viên hỗ trợ.');
+    });
+    image.addEventListener('load', () => { message('image-error', ''); setMapVisible(true); });
     image.src = MAP_IMAGE.src; image.width = MAP_IMAGE.width; image.height = MAP_IMAGE.height;
     for (const n of engine.qrNodes) {
-      const option = document.createElement('option'); option.value = n.id; option.textContent = n.name + ' · ' + n.id; $('manual-location-select').append(option);
+      const option = document.createElement('option'); option.value = n.id; option.textContent = n.name; $('manual-location-select').append(option);
     }
     $('btn-manual-select').addEventListener('click', () => {
       const value = $('manual-location-select').value;

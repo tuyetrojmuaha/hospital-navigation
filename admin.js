@@ -39,11 +39,7 @@
         const holder = document.createElement('div'); holder.className = 'qr-canvas';
         const instruction = document.createElement('div'); instruction.className = 'qr-instruction'; instruction.textContent = 'Quét mã QR để tìm đường đi trong Bệnh viện';
         const name = document.createElement('div'); name.className = 'qr-name'; name.textContent = 'Vị trí hiện tại: ' + node.name;
-        const meta = document.createElement('div'); meta.className = 'qr-meta no-print';
-        meta.textContent = `${node.id} · Tầng ${node.floor} · Tọa độ (${node.x}, ${node.y})`;
-        const preview = document.createElement('a'); preview.href = link; preview.textContent = 'Mở thử vị trí'; preview.target = '_blank'; preview.rel = 'noopener noreferrer';
-        meta.append(document.createElement('br'), preview);
-        card.append(holder, instruction, name, meta); fragment.append(card);
+        card.append(holder, instruction, name); fragment.append(card);
         new QRCode(holder, {text:link, width:240, height:240, colorDark:'#000000', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M});
         jobs.push(stableImage(holder));
       }
