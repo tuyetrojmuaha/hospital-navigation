@@ -1,61 +1,66 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chỉ đường Bệnh viện</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Chỉ đường trong Bệnh viện</title>
+  <link rel="stylesheet" href="style.css?v=20260923-1">
+  <script defer src="map-image.js?v=20260923-1"></script>
+  <script defer src="map-data.js?v=20260923-1"></script>
+  <script defer src="navigation-core.js?v=20260923-1"></script>
+  <script defer src="app.js?v=20260923-1"></script>
 </head>
 <body>
   <header class="app-header">🏥 Chỉ đường trong Bệnh viện</header>
-
-  <!-- MÀN HÌNH 1: CHƯA XÁC ĐỊNH ĐƯỢC VỊ TRÍ (mở trang trực tiếp, không qua link QR) -->
-  <section id="screen-no-location" class="screen hidden">
-    <h2>Xác định vị trí của bạn</h2>
-    <p>Hãy dùng camera điện thoại (hoặc app quét QR bất kỳ) quét mã QR dán trên tường,
-      sau đó bấm vào đường link hiện ra để mở lại trang này với đúng vị trí của bạn.</p>
-    <p id="scan-error" class="error-text"></p>
-
-    <div class="manual-fallback">
-      <p>Không quét được mã? Chọn vị trí hiện tại thủ công:</p>
-      <select id="manual-location-select">
-        <option value="">-- Chọn vị trí --</option>
-      </select>
-      <button id="btn-manual-select" class="btn-secondary">Xác nhận vị trí</button>
-    </div>
-  </section>
-
-  <!-- MÀN HÌNH 2: CHỌN ĐÍCH ĐẾN -->
-  <section id="screen-destination" class="screen hidden">
-    <p id="current-location-label" class="current-location"></p>
-    <h2>Bạn muốn đến đâu?</h2>
-    <input
-      id="destination-search"
-      type="text"
-      class="search-input"
-      placeholder="Gõ tên khoa, phòng, hoặc khu nhà (vd: Cấp cứu, N1A...)"
-    />
-    <div id="destination-list" class="destination-list"></div>
-    <button id="btn-back-to-scan" class="btn-secondary">← Quét lại vị trí</button>
-  </section>
-
-  <!-- MÀN HÌNH 3: HIỂN THỊ CHỈ DẪN (BẢN ĐỒ + TEXT) -->
-  <section id="screen-directions" class="screen hidden">
-    <h2 id="directions-title"></h2>
-    <div id="floor-tabs" class="floor-tabs"></div>
-    <div class="map-container">
-      <img id="map-background" class="map-background" alt="Sơ đồ mặt bằng bệnh viện" />
-      <svg id="map-svg" class="map-svg-overlay" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-    <ol id="directions-list" class="directions-list"></ol>
-    <div class="button-row">
-      <button id="btn-back-to-destinations" class="btn-secondary">← Chọn đích khác</button>
-    </div>
-  </section>
-
-  <!-- map-image.js PHẢI nạp trước map-data.js vì map-data.js dùng biến MAP_BACKGROUND_DATA_URL -->
-  <script src="map-image.js?v=29"></script>
-  <script src="map-data.js?v=29"></script>
-  <script src="app.js?v=29"></script>
+  <main>
+    <div id="boot-status" class="notice" role="status">Đang tải sơ đồ… Nếu thông báo này không đổi, hãy tải lại trang hoặc hỏi nhân viên hỗ trợ.</div>
+    <noscript><p class="notice">Vui lòng bật JavaScript để xem chỉ đường, hoặc hỏi nhân viên hỗ trợ gần nhất.</p></noscript>
+    <section id="screen-no-location" class="screen" hidden>
+      <h1 tabindex="-1">Xác định vị trí của bạn</h1>
+      <p>Quét mã QR dán tại vị trí bạn đang đứng, hoặc chọn đúng vị trí bên dưới.</p>
+      <p id="scan-error" class="error-text" role="alert" hidden></p>
+      <label for="manual-location-select">Vị trí hiện tại</label>
+      <select id="manual-location-select"><option value="">— Chọn vị trí —</option></select>
+      <button id="btn-manual-select" class="btn-primary" type="button">Xác nhận vị trí</button>
+      <p class="muted">B09 và hai Nhà thể thao đa năng (B14, B15) không thuộc phạm vi dẫn đường.</p>
+    </section>
+    <section id="screen-destination" class="screen" hidden>
+      <p id="current-location-label" class="current-location"></p>
+      <h1 tabindex="-1">Bạn muốn đến đâu?</h1>
+      <label for="destination-search">Tên khoa, phòng hoặc khu nhà</label>
+      <input id="destination-search" class="search-input" type="search" placeholder="Ví dụ: cap cuu, N1A, tầng 2" autocomplete="off">
+      <p id="search-count" class="muted" role="status" aria-live="polite"></p>
+      <p id="route-error" class="error-text" role="alert" hidden></p>
+      <div id="destination-list" class="destination-list"></div>
+      <button id="btn-back-to-scan" class="btn-secondary" type="button">Đổi vị trí xuất phát</button>
+    </section>
+    <section id="screen-directions" class="screen screen-route" hidden>
+      <h1 id="directions-title" tabindex="-1"></h1>
+      <p id="route-origin" class="current-location"></p>
+      <p class="muted">Vị trí dựa trên QR hoặc lựa chọn của bạn; ứng dụng không theo dõi khi bạn di chuyển.</p>
+      <div id="floor-tabs" class="floor-tabs" role="group" aria-label="Chọn tầng xem sơ đồ"></div>
+      <p id="floor-note" class="notice"></p>
+      <div class="map-controls" role="group" aria-label="Phóng to sơ đồ">
+        <button id="zoom-out" type="button" aria-label="Thu nhỏ">−</button>
+        <button id="zoom-reset" type="button">100%</button>
+        <button id="zoom-in" type="button" aria-label="Phóng to">+</button>
+      </div>
+      <div class="map-container" tabindex="0" aria-label="Sơ đồ đường đi, có thể cuộn khi phóng to">
+        <div id="map-stage" class="map-stage zoom-1">
+          <img id="map-background" class="map-background" alt="Sơ đồ mặt bằng tổng thể Bệnh viện" width="1000" height="1298">
+          <svg id="map-svg" class="map-svg-overlay" viewBox="0 0 1000 1298" role="img" aria-label="Đường đi minh họa trên sơ đồ"></svg>
+        </div>
+      </div>
+      <p id="image-error" class="error-text" role="alert" hidden>Không tải được ảnh sơ đồ. Hãy tải lại trang hoặc hỏi nhân viên hỗ trợ.</p>
+      <ol id="directions-list" class="directions-list"></ol>
+      <p class="notice">Đối chiếu biển chỉ dẫn và lối đi thực tế. Nếu có cửa đóng hoặc đường bị chặn, hãy hỏi nhân viên hỗ trợ.</p>
+      <div class="button-row">
+        <button id="btn-back-to-destinations" class="btn-secondary" type="button">Chọn đích khác</button>
+        <button id="btn-route-change-origin" class="btn-secondary" type="button">Đổi vị trí xuất phát</button>
+      </div>
+    </section>
+  </main>
 </body>
 </html>

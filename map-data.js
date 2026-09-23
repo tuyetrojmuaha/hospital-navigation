@@ -1,39 +1,11 @@
 /**
- * DỮ LIỆU SƠ ĐỒ - BỆNH VIỆN TRUNG ƯƠNG QUÂN ĐỘI 108
- * Số 01 Trần Hưng Đạo, phường Hai Bà Trưng, Hà Nội
- * --------------------------------------------------------
- * Toạ độ x,y bên dưới được đo trên ảnh nền thật (map-image.js, kích thước 1000x1298 px).
- * SVG sẽ vẽ đè lên đúng ảnh này bằng cách dùng viewBox trùng kích thước ảnh, nên KHÔNG được
- * đổi kích thước ảnh mà không cập nhật lại MAP_IMAGE bên dưới.
- *
- * Node = một điểm mốc. Có 4 loại:
- *   - Khu nhà / cổng (isDestination / isGate): điểm bắt đầu (quét QR) hoặc đích đến.
- *   - Cửa vào (isEntrance): điểm CỬA THẬT của một khu nhà, nối tới node ảo của khu nhà đó
- *     (field parentBuilding) bằng 1 edge ngắn. Khu nhà nào có nhiều cửa (như Toà Tháp đôi -
- *     B08 với Sảnh A/B/C + Cấp cứu) thì tách thành nhiều node isEntrance, Dijkstra sẽ tự
- *     chọn cửa gần nhất. Các khu nhà còn lại hiện chỉ có 1 điểm ước lượng gần cửa (xem dưới),
- *     không tách thành isEntrance vì sơ đồ tổng thể không ghi rõ vị trí cửa của chúng.
- *   - Waypoint (isWaypoint): điểm gãy của lối đi thật, đặt tại các hàng mũi tên đỏ hai chiều
- *     trên sơ đồ gốc. Không hiện trong danh sách chọn đích, không có mã QR.
- *
- * GIỚI HẠN HIỆN TẠI - LỐI ĐI TRONG NHÀ:
- * Sơ đồ gốc (T1.pdf) chỉ là bản vẽ mặt bằng TỔNG THỂ (nhìn từ trên xuống) + bảng liệt kê
- * khoa/tầng bằng chữ. Nó KHÔNG có bản vẽ mặt bằng nội thất (hành lang, cầu thang, vị trí
- * phòng) của từng tầng/từng toà, nên hệ thống chưa thể dẫn đường bên trong toà nhà (chỉ dẫn
- * dừng lại ở "vào toà nhà qua cửa nào, lên tầng mấy"). Muốn có bước này, cần bản vẽ mặt bằng
- * nội thất riêng cho từng toà/từng tầng (ảnh hoặc CAD) - xem khung INDOOR_PLANS ở cuối file,
- * đã dựng sẵn cấu trúc để cắm dữ liệu này vào khi có, dùng chung logic Dijkstra/vẽ SVG như
- * bản đồ tổng thể, chỉ khác ảnh nền và toạ độ là của riêng từng tầng.
- *
- * Edge = một đoạn lối đi nối 2 mốc. Để đường đi không cắt xuyên qua nhà khác, mỗi khu nhà/cổng
- * chỉ nên nối tới waypoint gần nhất (không nối thẳng khu nhà này với khu nhà kia).
- * Trọng số (weight) của edge được TỰ TÍNH bằng khoảng cách toạ độ (xem app.js), trừ khi bạn tự
- * khai báo weight cụ thể. Một edge cũng có thể khai báo `instruction` + `icon` riêng (xem các
- * edge cửa vào của B08) để hiện đúng câu chỉ dẫn thay vì tự tính rẽ trái/phải.
+ * Dữ liệu gốc: giữ nguyên toàn bộ tọa độ, node và cạnh đang hoạt động.
+ * B09/B14/B15 cố ý không tham gia dẫn đường (routingEnabled: false).
+ * B12_CUA1/B12_CUA2/B13_LOIVAO là lối vào, được đi qua để tới đích.
+ * Tọa độ tầng trên dùng ảnh khuôn viên, chỉ là sơ đồ minh họa.
+ * Không có bản vẽ nội thất đã được kiểm chứng trong INDOOR_PLANS.
+ * Xem CONFIG-GUIDE.md trước khi thay đổi lối đi.
  */
-
-// Ảnh nền mặt bằng thật + kích thước gốc (dùng làm viewBox cho SVG đè lên trên).
-// Nội dung ảnh (base64) nằm trong map-image.js, được nạp TRƯỚC file này trong index.html.
 const MAP_IMAGE = {
   src: MAP_BACKGROUND_DATA_URL,
   width: 1000,
@@ -42,15 +14,11 @@ const MAP_IMAGE = {
 
 const HOSPITAL_MAP = {
   nodes: [
-    // ----- CỔNG RA VÀO (mốc quét QR khi vừa vào viện) -----
     { id: "G_1A", name: "Cổng 1A",         x: 527, y: 388, floor: 1, isGate: true },
     { id: "G_1B", name: "Cổng 1B",         x: 350, y: 330, floor: 1, isGate: true },
     { id: "G_CC", name: "Cổng Cấp cứu",    x: 112, y: 486, floor: 1, isGate: true },
     { id: "G_5",  name: "Cổng số 5",       x: 124, y: 1030, floor: 1, isGate: true },
 
-    // ----- 16 KHU NHÀ (toạ độ đo theo ảnh 1000x1298) -----
-    // Toạ độ đã dịch nhẹ (~16px) về phía lối đi/waypoint kết nối gần nhất, để gần với
-    // "cửa vào" hơn là tâm hình khối của toà nhà (xem ghi chú CỬA VÀO ở đầu file).
     { id: "B01", name: "Nhà N1A",                              x: 296, y: 386,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B02", name: "Nhà N1B",                              x: 422, y: 386,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B03", name: "Nhà N2A",                              x: 374, y: 448,  floor: 1, isDestination: true, isTransitPoint: true },
@@ -59,19 +27,15 @@ const HOSPITAL_MAP = {
     { id: "B06", name: "Nhà N3",                                x: 472, y: 520,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B07", name: "Trung tâm thẩm mỹ",                    x: 609, y: 422,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B08", name: "Tòa Tháp đôi",                          x: 220, y: 675,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 496, y: 607,  floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B09", name: "Viện Bảo vệ, chăm sóc SK cán bộ TW",    x: 496, y: 607,  floor: 1, isDestination: true, isTransitPoint: true, routingEnabled: false },
     { id: "B10", name: "Nhà Chỉ huy cơ quan",                   x: 496, y: 747,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B11", name: "Viện Lâm sàng các bệnh truyền nhiễm",  x: 299, y: 920,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B12", name: "Nhà để xe nhân viên",                   x: 176, y: 970,  floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B13", name: "Nhà lưu trú",                           x: 165, y: 904,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 618, y: 634,  floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 588, y: 750,  floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B14", name: "Nhà thể thao đa năng (1)",              x: 618, y: 634,  floor: 1, isDestination: true, isTransitPoint: true, routingEnabled: false },
+    { id: "B15", name: "Nhà thể thao đa năng (2)",              x: 588, y: 750,  floor: 1, isDestination: true, isTransitPoint: true, routingEnabled: false },
     { id: "B16", name: "Nhà tang lễ",                           x: 353, y: 1129, floor: 1, isDestination: true, isTransitPoint: true },
 
-    // ----- HANH LANG NOI THAT B01 (Nhà N1A) - lap lai o ca 4 tang -----
-    // (Đã xoá 5 node "Hành lang Tầng 1" cũ - id B01_F1_1 đến B01_F1_5 - vì bị thay thế hoàn
-    // toàn bởi 5 điểm chức năng thật ở khối "B01 (Nhà N1A) - TANG 1" bên dưới. Node cũ để sót
-    // lại từng gây lỗi: đường đi bị vòng lên Tầng 2 rồi quay lại Tầng 1 một cách vô lý.)
     { id: "B01_F2_1", name: "Hành lang Tầng 2", x: 256, y: 400, floor: 2, isWaypoint: true },
     { id: "B01_F2_2", name: "Hành lang Tầng 2", x: 276, y: 399, floor: 2, isWaypoint: true },
     { id: "B01_F2_3", name: "Hành lang Tầng 2", x: 294, y: 398, floor: 2, isWaypoint: true },
@@ -88,7 +52,6 @@ const HOSPITAL_MAP = {
     { id: "B01_F4_4", name: "Hành lang Tầng 4", x: 311, y: 399, floor: 4, isWaypoint: true },
     { id: "B01_F4_5", name: "Hành lang Tầng 4", x: 326, y: 398, floor: 4, isWaypoint: true },
 
-    // ----- HANH LANG NOI THAT B02 (Nhà N1B) - lap lai o ca 4 tang -----
     { id: "B02_F2_1", name: "Hành lang Tầng 2", x: 400, y: 397, floor: 2, isWaypoint: true },
     { id: "B02_F2_2", name: "Hành lang Tầng 2", x: 414, y: 397, floor: 2, isWaypoint: true },
     { id: "B02_F2_3", name: "Hành lang Tầng 2", x: 430, y: 399, floor: 2, isWaypoint: true },
@@ -108,7 +71,6 @@ const HOSPITAL_MAP = {
     { id: "B02_F4_5", name: "Hành lang Tầng 4", x: 466, y: 410, floor: 4, isWaypoint: true },
     { id: "B02_F4_6", name: "Hành lang Tầng 4", x: 482, y: 418, floor: 4, isWaypoint: true },
 
-    // ----- HANH LANG NOI THAT B03 (Nhà N2A) - lap lai o ca 4 tang -----
     { id: "B03_F2_1", name: "Hành lang Tầng 2", x: 355, y: 412, floor: 2, isWaypoint: true },
     { id: "B03_F2_2", name: "Hành lang Tầng 2", x: 350, y: 428, floor: 2, isWaypoint: true },
     { id: "B03_F2_3", name: "Hành lang Tầng 2", x: 356, y: 442, floor: 2, isWaypoint: true },
@@ -122,7 +84,6 @@ const HOSPITAL_MAP = {
     { id: "B03_F4_3", name: "Hành lang Tầng 4", x: 356, y: 442, floor: 4, isWaypoint: true },
     { id: "B03_F4_4", name: "Hành lang Tầng 4", x: 355, y: 462, floor: 4, isWaypoint: true },
 
-    // ----- HANH LANG NOI THAT B06 (Nhà N3) - lap lai o ca 4 tang -----
     { id: "B06_F2_1", name: "Hành lang Tầng 2", x: 414, y: 506, floor: 2, isWaypoint: true },
     { id: "B06_F2_2", name: "Hành lang Tầng 2", x: 436, y: 506, floor: 2, isWaypoint: true },
     { id: "B06_F2_3", name: "Hành lang Tầng 2", x: 459, y: 506, floor: 2, isWaypoint: true },
@@ -145,18 +106,6 @@ const HOSPITAL_MAP = {
     { id: "B06_F4_6", name: "Hành lang Tầng 4", x: 520, y: 506, floor: 4, isWaypoint: true },
     { id: "B06_F4_7", name: "Hành lang Tầng 4", x: 546, y: 505, floor: 4, isWaypoint: true },
 
-    // ----- CỬA VÀO THẬT CỦA TOÀ THÁP ĐÔI (B08) -----
-    // Đây là toà nhà DUY NHẤT trong sơ đồ ghi rõ nhiều cửa vào riêng biệt (Sảnh A, Sảnh B,
-    // Sảnh C + 1 lối Cấp cứu riêng, có icon chữ thập đỏ). Mỗi cửa là 1 node isEntrance:true,
-    // nối vào B08 (node ảo đại diện cho cả toà nhà, dùng để tìm kiếm/hiện tên) bằng 1 edge
-    // ngắn — nhờ vậy Dijkstra tự chọn cửa GẦN NHẤT theo hướng người dùng đang đi tới.
-    // Lưu ý: chưa xác định được khoa nào trong B08 đi qua cửa nào (sơ đồ không ghi), nên
-    // danh mục khoa/phòng của B08 (BUILDING_DIRECTORY) vẫn dùng chung, chỉ khác ở việc
-    // chọn cửa vào gần nhất khi đến nơi.
-    // (4 cửa vào ước lượng cũ B08_SANHA/B/C/CAPCUU đã được thay bằng 10 điểm chi tiết thật
-    // ở khối "B08 (Toà Tháp đôi)" bên dưới, dựa theo toạ độ + tên khu chức năng bạn cung cấp.)
-
-    // ===== DIEM MAT BANG (v2 - gon hon, 51 diem, do nguoi dung tu danh dau lai) =====
     { id: "P_G1", name: "Lối đi gần Nhà N1A", x: 324, y: 310, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G2", name: "Lối đi gần Nhà N1B", x: 409, y: 338, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G3", name: "Lối đi", x: 374, y: 338, floor: 1, isWaypoint: true },
@@ -204,26 +153,21 @@ const HOSPITAL_MAP = {
     { id: "P_G49", name: "Lối đi gần Nhà để xe nhân viên", x: 195, y: 1031, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G50", name: "Lối đi gần Nhà tang lễ", x: 292, y: 1126, floor: 1, isWaypoint: true, isQRPoint: true },
     { id: "P_G51", name: "Lối đi", x: 346, y: 1127, floor: 1, isWaypoint: true },
-	//{ id: "P_G52", name: "Lối đi trước bãi xe nhân viên", x: 150, y: 1025, floor: 1, isWaypoint: true },
-	
-	//{ id: "P_G60", name: "Lối đi ngã 3 bãi xe nhân viên", x: 195, y: 1020, floor: 1, isWaypoint: true },
+
 	{ id: "P_G61", name: "Lối đi ngã 3 cấp cứu, trung tâm gia tốc", x: 220, y: 550, floor: 1, isWaypoint: true },
-    // Điểm bổ sung: vòng qua góc phải hàng cây dài gần Nhà thể thao đa năng (B14),
-    // tránh cắt thẳng qua bồn cây như trước.
     { id: "P_G55", name: "Lối đi", x: 610, y: 700, floor: 1, isWaypoint: true },
-	
-	
+
 	{ id: "P_G62", name: "Lối đi", x: 183, y: 611, floor: 1, isWaypoint: true },
 	{ id: "P_G63", name: "Lối đi", x: 183, y: 669, floor: 1, isWaypoint: true },
 	{ id: "P_G64", name: "Lối đi", x: 183, y: 730, floor: 1, isWaypoint: true },
 	{ id: "P_G65", name: "Lối đi", x: 523, y: 605, floor: 1, isWaypoint: true },
 	{ id: "P_G66", name: "Lối đi", x: 458, y: 376, floor: 1, isWaypoint: true },
 	{ id: "P_G67", name: "Lối đi", x: 394, y: 337, floor: 1, isWaypoint: true },
-	
+
     { id: "B_XEMAY", name: "Nhà để xe máy", x: 317, y: 311, floor: 1, isDestination: true },
     { id: "B01_CUA1", name: "Lối vào 1 (Nhà N1A)", x: 310, y: 388, floor: 1, isDestination: true, isTransitPoint: true },
-    { id: "B12_CUA1", name: "Lối vào 1 (Nhà để xe nhân viên)", x: 150, y: 1004, floor: 1, isDestination: true, isTransitPoint: false },
-    { id: "B12_CUA2", name: "Lối vào 2 (Nhà để xe nhân viên)", x: 179, y: 941, floor: 1, isDestination: true, isTransitPoint: false },
+    { id: "B12_CUA1", name: "Lối vào 1 (Nhà để xe nhân viên)", x: 150, y: 1004, floor: 1, isDestination: true, isTransitPoint: true },
+    { id: "B12_CUA2", name: "Lối vào 2 (Nhà để xe nhân viên)", x: 179, y: 941, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_CUA2", name: "Lối vào 2 (Nhà N1A)", x: 304, y: 420, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B02_CUA1", name: "Lối vào 1 (Nhà N1B)", x: 381, y: 387, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B02_CUA2", name: "Lối vào 2 (Nhà N1B)", x: 380, y: 418, floor: 1, isDestination: true, isTransitPoint: true },
@@ -234,35 +178,21 @@ const HOSPITAL_MAP = {
     { id: "B08_SANHA", name: "Sảnh A (Toà Tháp đôi)", x: 259, y: 687, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B08_SANHB", name: "Sảnh B (Toà Tháp đôi)", x: 188, y: 773, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B08_SANHC", name: "Sảnh C (Toà Tháp đôi)", x: 183, y: 570, floor: 1, isDestination: true, isTransitPoint: true },
-    // 2 điểm bổ sung: vỉa hè đường Trần Thánh Tông, bắc cầu qua khoảng trống dọc mặt Tây
-    // nhà 08 (giữa Sảnh C và Sảnh B) - trước đây không có điểm nào ở đây nên bị vòng xa
-    // qua tận phía Đông (qua sân vườn) mới tới được.
-    //{ id: "P_G53", name: "Lối đi", x: 100, y: 560, floor: 1, isWaypoint: true },
-    //{ id: "P_G54", name: "Lối đi", x: 100, y: 780, floor: 1, isWaypoint: true },
-    // Điểm bổ sung: mép sân lát đá bên trái đỉnh vườn hoa tam giác (giữa Toà Tháp đôi và Nhà 09),
-    // để đi thẳng theo đúng mép sân thay vì vòng xa qua bên phải/dưới vườn hoa.
-    // (Đã bỏ P_G52 - nối thẳng P_G27 tới P_G30 đi sát đúng đỉnh chóp tam giác vườn hoa,
-    // không cần điểm trung gian.)
-    // ===== B01 (Nhà N1A) - TANG 1: 5 khu chuc nang rieng =====
     { id: "B01_F1_THUOC", name: "Nhà thuốc số 2 (Nhà N1A, Tầng 1)", x: 257, y: 399, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_F1_DKKD", name: "Khu đăng ký khám dịch vụ (Nhà N1A, Tầng 1)", x: 294, y: 390, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_F1_BHYT", name: "Khu đăng ký khám BHYT (Nhà N1A, Tầng 1)", x: 311, y: 398, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_F1_HD", name: "Khu hướng dẫn (Nhà N1A, Tầng 1)", x: 327, y: 398, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B01_F1_TT", name: "Khu thanh toán (Nhà N1A, Tầng 1)", x: 285, y: 406, floor: 1, isDestination: true, isTransitPoint: true },
 
-    // ===== B02 (Nhà N1B) - TANG 1: 2 khu chuc nang =====
     { id: "B02_F1_XQUANG", name: "Khu vực Xquang (Nhà N1B, Tầng 1)", x: 400, y: 397, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B02_F1_MRI", name: "Khu vực Cộng hưởng từ MRI (Nhà N1B, Tầng 1)", x: 461, y: 415, floor: 1, isDestination: true, isTransitPoint: true },
 
-    // ===== B03 (Nhà N2A) - moi tang 1 khu duy nhat =====
     { id: "B03_F1_BHYT", name: "Khu vực cấp phát thuốc BHYT (Nhà N2A, Tầng 1)", x: 337, y: 440, floor: 1, isDestination: true, isTransitPoint: true },
 
-    // ===== B06 (Nhà N3) - TANG 1 =====
     { id: "B06_F1_XQUANG", name: "Khu vực Xquang, điện tim, siêu âm (Nhà N3, Tầng 1)", x: 521, y: 507, floor: 1, isDestination: true, isTransitPoint: true },
     { id: "B06_TM", name: "Thang máy (Nhà N3)", x: 478, y: 507, floor: 1, isDestination: true },
     { id: "B06_TB", name: "Thang bộ (Nhà N3)", x: 506, y: 497, floor: 1, isDestination: true, isTransitPoint: true },
 
-    // ===== B08 (Toà Tháp đôi) - 10 diem chi tiet, thay cho 4 cua vao uoc luong cu =====
     { id: "B08_CAPCUU", name: "Khu Cấp cứu C1.3 (Toà Tháp đôi)", x: 142, y: 566, floor: 1, isDestination: true, isTransitPoint: false },
     { id: "B08_KHAMA", name: "Khu khám A - Bộ đội hưu và Viettel (Toà Tháp đôi)", x: 209, y: 592, floor: 1, isDestination: true, isTransitPoint: false },
     { id: "B08_NGOAIKHOA", name: "Nhà Ngoại khoa (Toà Tháp đôi)", x: 237, y: 593, floor: 1, isDestination: true, isTransitPoint: false },
@@ -274,16 +204,11 @@ const HOSPITAL_MAP = {
     { id: "B08_NOIKHOA", name: "Nhà Nội khoa (Toà Tháp đôi)", x: 237, y: 733, floor: 1, isDestination: true, isTransitPoint: false },
     { id: "B08_TM_NOIKHOA", name: "Thang máy Nhà Nội khoa (Toà Tháp đôi)", x: 200, y: 705, floor: 1, isDestination: true, isTransitPoint: true },
 
-    // ===== B10 (Nha Chi huy co quan) - 2 sanh rieng =====
-    // (Đã bỏ Sảnh B - Nhà Chỉ huy cơ quan theo yêu cầu)
     { id: "B10_SANHA", name: "Sảnh A (Nhà Chỉ huy cơ quan)", x: 497, y: 726, floor: 1, isDestination: true },
 
-    // ===== B13 - loi vao cu the =====
-    { id: "B13_LOIVAO", name: "Lối vào Nhà lưu trú", x: 164, y: 916, floor: 1, isDestination: true },
+    { id: "B13_LOIVAO", name: "Lối vào Nhà lưu trú", x: 164, y: 916, floor: 1, isDestination: true, isTransitPoint: true },
   ],
 
-  // Lối đi giữa các mốc - đi theo khoảng SÂN/ĐƯỜNG TRỐNG thực tế, ĐÚNG TẠI các hàng mũi tên
-  // đỏ hai chiều trên sơ đồ gốc. KHÔNG nối thẳng building với building.
   edges: [
     { from: "B01_F1_THUOC", to: "B01_F1_DKKD" },
     { from: "B01_F1_DKKD", to: "B01_F1_BHYT" },
@@ -297,36 +222,28 @@ const HOSPITAL_MAP = {
     { from: "B02_F1_XQUANG", to: "B02_F2_6", isElevator: true, instruction: "Đi thang bộ lên Tầng 2 - Nhà N1B" },
     { from: "B03", to: "B03_F1_BHYT" },
     { from: "B03_F1_BHYT", to: "B03_F2_4", isElevator: true, instruction: "Đi thang máy/thang bộ lên Tầng 2 - Nhà N2A" },
-	
+
 	{ from: "B05", to: "P_G18" },
-	
+
     { from: "B06", to: "B06_F1_XQUANG" },
     { from: "B06_F1_XQUANG", to: "B06_TB" },
     { from: "B06_TB", to: "B06_TM" },
     { from: "B06_TM", to: "B06_F2_7", isElevator: true, instruction: "Đi thang máy lên Tầng 2 - Nhà N3" },
-    //{ from: "B08_CAPCUU", to: "B08_KHAMA" },
     { from: "B08_KHAMA", to: "B08_NGOAIKHOA" },
     { from: "B08_NGOAIKHOA", to: "B08_TM_NGOAIKHOA" },
     { from: "B08_TM_NGOAIKHOA", to: "B08_TM_CANLAMSANG" },
     { from: "B08_TM_CANLAMSANG", to: "B08_SANHCHINH" },
     { from: "B08_SANHCHINH", to: "B08_KHAMB" },
-    //{ from: "B08_KHAMB", to: "B08_NHATHUOC1" },
     { from: "B08_KHAMB", to: "B08_NOIKHOA" },
     { from: "B08_NOIKHOA", to: "B08_TM_NOIKHOA" },
     { from: "B08", to: "B08_SANHCHINH" },
-    // (3 cầu nối cũ B08_SANHCHINH/CAPCUU/NOIKHOA -> P_G86/101/128 đã được thay bằng kết nối
-    // mới tới mạng lưới P_G v2 ở block "NOI KHU NHA/CONG/HANH LANG..." bên dưới)
-    // (Đã xoá cạnh Sảnh A - Sảnh B do Sảnh B không còn tồn tại)
     { from: "B10", to: "B10_SANHA" },
-	
+
 	{ from: "B13_LOIVAO", to: "B13" },
-    // (Đã xoá 6 cạnh của hành lang Tầng 1 cũ - xem ghi chú ở phần khai báo node phía trên)
     { from: "B01_F2_1", to: "B01_F2_2" },
     { from: "B01_F2_2", to: "B01_F2_3" },
     { from: "B01_F2_3", to: "B01_F2_4" },
     { from: "B01_F2_4", to: "B01_F2_5" },
-    // (Đã xoá cạnh thang máy cũ "B01_F1_5 -> B01_F2_5" vì B01_F1_5 không còn tồn tại - lên
-    // Tầng 2 giờ đi qua B01_F1_HD hoặc B01_F1_DKKD, xem 2 cạnh isElevator phía trên.)
     { from: "B01_F3_1", to: "B01_F3_2" },
     { from: "B01_F3_2", to: "B01_F3_3" },
     { from: "B01_F3_3", to: "B01_F3_4" },
@@ -385,7 +302,6 @@ const HOSPITAL_MAP = {
     { from: "B06_F4_5", to: "B06_F4_6" },
     { from: "B06_F4_6", to: "B06_F4_7" },
     { from: "B06_F3_7", to: "B06_F4_7", isElevator: true, instruction: "Đi thang máy/cầu thang lên Tầng 4 - Nhà N3" },
-    // ===== MANG LUOI LOI DI MAT BANG (v2, ban kinh ghep 90px + cau noi thu cong) =====
     { from: "P_G1", to: "P_G2" },
     { from: "P_G1", to: "P_G3" },
     { from: "P_G1", to: "P_G4" },
@@ -442,8 +358,6 @@ const HOSPITAL_MAP = {
     { from: "P_G28", to: "P_G29" },
     { from: "P_G28", to: "P_G31" },
     { from: "P_G28", to: "P_G32" },
-    // (Đã xoá cạnh P_G29 -> P_G30 vì cắt thẳng qua vườn hoa tam giác giữa Toà Tháp đôi và Nhà 09.
-    // Giờ buộc phải đi vòng qua P_G31 - P_G30, đúng theo mép sân quanh vườn hoa.)
     { from: "P_G29", to: "P_G31" },
     { from: "P_G27", to: "P_G30" },
     { from: "P_G29", to: "P_G32" },
@@ -468,7 +382,6 @@ const HOSPITAL_MAP = {
     { from: "P_G47", to: "P_G50" },
     { from: "P_G49", to: "P_G47" },
 
-    // ===== NOI KHU NHA/CONG/HANH LANG TOI DIEM MAT BANG MOI GAN NHAT =====
     { from: "G_1A", to: "P_G8" },
     { from: "G_1B", to: "P_G3" },
     { from: "G_CC", to: "P_G19" },
@@ -508,12 +421,12 @@ const HOSPITAL_MAP = {
 	{ from: "P_G64", to: "B08_NOIKHOA" },
 	{ from: "P_G64", to: "B08_TM_NOIKHOA" },
 	{ from: "P_G64", to: "B08_TM_CANLAMSANG" },
-	
+
 	{ from: "P_G63", to: "P_G62" },
 	{ from: "P_G64", to: "P_G63" },
 	{ from: "B08_SANHCHINH", to: "P_G63" },
 	{ from: "P_G63", to: "B08_TM_CANLAMSANG" },
-	
+
 	{ from: "B08_SANHC", to: "P_G62" },
 	{ from: "P_G62", to: "B08_KHAMA" },
 	{ from: "P_G62", to: "B08_NGOAIKHOA" },
@@ -527,32 +440,13 @@ const HOSPITAL_MAP = {
     { from: "B12", to: "B12_CUA1" },
     { from: "B12", to: "B12_CUA2" },
 
-
     { from: "B16", to: "P_G51" },
-    // Khu Cấp cứu có CỬA RIÊNG thẳng ra ngoài (giống lối cấp cứu thật ở bệnh viện, không đi
-    // qua Sảnh chính) - khác với Khu khám A/B, Nội khoa, Cận lâm sàng là các điểm sâu bên
-    // trong thật sự, bắt buộc phải qua 1 trong 3 Sảnh trước.
     { from: "B08_CAPCUU", to: "P_G26" },
-    // (Đã xoá 4 cạnh "tắt" còn lại nối thẳng điểm nội bộ ra mặt bằng ngoài trời, bỏ qua Sảnh A/B/C -
-    // đây chính là nguyên nhân khiến đường đi cắt xuyên qua nhà 08 thay vì đi vào đúng cửa.
-    // Giờ MỌI lộ trình vào nhà 08 bắt buộc phải qua 1 trong 3 Sảnh trước.)
 
-    // ===== NOI THANG cho cac diem co cua/loi vao rieng (tranh phai vong qua node cha) =====
-    // Phát hiện qua phản hồi thực tế: Sảnh A của B10 nằm xa B10 nên đi vòng xuống B10 trước
-    // khi ra ngoài — giờ nối thẳng từng điểm tới đúng lối đi mặt bằng gần NÓ nhất.
-    //{ from: "B10_SANHA", to: "P_G33" },
-    // (Đã xoá cạnh Sảnh B -> P_G36 do Sảnh B không còn tồn tại)
     { from: "B13_LOIVAO", to: "P_G45" },
-    // (Đã xoá cạnh tắt KHAMA->P_G23, TM_CANLAMSANG->P_G26, KHAMB->P_G41 - xem ghi chú ở trên)
   ],
 };
 
-/**
- * DANH MỤC KHOA/PHÒNG THEO TỪNG TẦNG CỦA MỖI KHU NHÀ
- * (lấy trực tiếp từ chú thích trong sơ đồ)
- * - buildingId phải khớp với id của node ở trên.
- * - floor: null nếu toà nhà không chia theo tầng cụ thể trong sơ đồ.
- */
 const BUILDING_DIRECTORY = {
   B01: [
     { floor: 1, desc: "Nhà thuốc số 2 C1.1A", nodeId: "B01_F1_THUOC" },
@@ -623,35 +517,4 @@ const BUILDING_DIRECTORY = {
   B16: [{ floor: null, desc: "Nhà tang lễ", nodeId: "B16" }],
 };
 
-/**
- * KHUNG DỮ LIỆU CHO LỐI ĐI TRONG NHÀ (chưa có dữ liệu thật - để trống)
- * --------------------------------------------------------------------
- * Khi có bản vẽ mặt bằng nội thất (ảnh hoặc CAD) của 1 toà/1 tầng cụ thể, thêm 1 mục vào đây
- * theo đúng cấu trúc mẫu bên dưới (đã comment). App sẽ dùng CHUNG thuật toán Dijkstra và cách
- * vẽ SVG-đè-lên-ảnh-nền như bản đồ tổng thể — chỉ khác ảnh nền + toạ độ là của riêng tầng đó.
- *
- * Cấu trúc mẫu (bỏ comment và điền số liệu thật khi có bản vẽ):
- *
- * const INDOOR_PLANS = {
- *   // key = id của cửa vào (isEntrance) hoặc khu nhà, ví dụ "B08_SANHA"
- *   B08_SANHA: {
- *     floor: 1,                          // bản vẽ này là của tầng mấy
- *     image: "data:image/jpeg;base64,...", // ảnh mặt bằng nội thất tầng đó (nhúng base64 như map-image.js)
- *     imageWidth: 800,
- *     imageHeight: 600,
- *     nodes: [
- *       // toạ độ đo theo ẢNH NỘI THẤT này (hệ toạ độ riêng, không liên quan map tổng thể)
- *       { id: "B08_SANHA_LOBBY", name: "Sảnh vào", x: 40, y: 300 },
- *       { id: "B08_SANHA_STAIR", name: "Cầu thang", x: 200, y: 150 },
- *       { id: "B08_KHOA_CAPCUU_C1", name: "Khoa Cấp cứu C1-3", x: 400, y: 120, isDestination: true },
- *     ],
- *     edges: [
- *       { from: "B08_SANHA_LOBBY", to: "B08_SANHA_STAIR" },
- *       { from: "B08_SANHA_STAIR", to: "B08_KHOA_CAPCUU_C1" },
- *     ],
- *   },
- * };
- *
- * Hiện KHÔNG có dữ liệu này (giữ để trống), vì file sơ đồ gốc T1.pdf không có bản vẽ nội thất.
- */
 const INDOOR_PLANS = {};

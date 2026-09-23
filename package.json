@@ -1,0 +1,16 @@
+{
+  "name": "hospital-navigation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static hospital wayfinding; npm is only needed for optional DOM tests.",
+  "scripts": {
+    "test": "node --test tests/core.test.cjs",
+    "test:dom": "node tests/dom.test.cjs"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "@napi-rs/canvas": "0.1.100",
+    "jsdom": "26.1.0",
+    "jsqr": "1.4.0"
+  }
+}

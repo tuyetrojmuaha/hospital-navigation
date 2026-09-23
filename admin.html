@@ -1,91 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tạo mã QR - Quản trị</title>
-  <link rel="stylesheet" href="style.css" />
-  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=fLiYFweah9AjZIDItdcAA9oscSadtI1Umr_SejAMkSwK9U4iwMhwzpaWsHkhdRk32vlzPHfm5BzsDrmrRtEpC2U7jgAcYa73z7jqAdBAs_F5bzDewL2QjXp1alalQm6UM7T8b41UwiO6KhsNzmy3rS--47ITcJ8s2eftzToJRWzGLUXFi4Znb7Um6vSvbFRNgaNy58HZ_4a2oxRb88Xujmw_kH5UQilk8tJoh5O2e4ddri-VpKrKFDp2i7d2tSKFfyd8ks6cPLGL21DquDPa-gKuDwSjCGAXRTqwO6v01_PzfNYg0r4cJMNmP5vrCrd2" charset="UTF-8"></script><style>
-    .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; padding: 16px; }
-    .qr-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; }
-    .qr-card canvas { margin: 0 auto; }
-    .qr-card .qr-instruction { margin-top: 10px; font-size: 13px; font-weight: 700; line-height: 1.35; }
-    .qr-card .qr-name { font-weight: 700; margin-top: 6px; }
-    @media print {
-      .no-print { display: none; }
-      .qr-card { break-inside: avoid; }
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="robots" content="noindex,nofollow">
+  <title>In mã QR dán tường</title>
+  <link rel="stylesheet" href="style.css?v=20260923-1">
+  <script defer src="config.js?v=20260923-1"></script>
+  <script defer src="vendor/qrcode.min.js"></script>
+  <script defer src="map-image.js?v=20260923-1"></script>
+  <script defer src="map-data.js?v=20260923-1"></script>
+  <script defer src="navigation-core.js?v=20260923-1"></script>
+  <script defer src="admin.js?v=20260923-1"></script>
 </head>
 <body>
-  <header class="app-header">🖨️ In mã QR dán tường (Quản trị)</header>
-  <p class="no-print" style="text-align:center; padding: 8px 16px;">
-    Mỗi thẻ dưới đây tương ứng với một vị trí trong <code>map-data.js</code>. Mã QR chứa
-    <strong>đường link đầy đủ</strong> tới <code>index.html</code> kèm vị trí — quét bằng camera điện thoại rồi
-    bấm vào link sẽ mở app đúng ngay vị trí đó, không cần quét lại trong app.
-  </p>
-  <div class="no-print" style="max-width:480px;margin:0 auto 16px;padding:0 16px;">
-    <label for="base-url-input" style="font-size:13px;color:#6b7280;">
-      Địa chỉ trang <code>index.html</code> sau khi deploy (tự động điền, có thể sửa nếu sai):
-    </label>
-    <input id="base-url-input" type="text" class="search-input" style="margin-top:4px;" />
-  </div>
-  <button class="no-print btn-secondary" style="display:block;margin:0 auto 8px;" onclick="window.print()">In tất cả mã QR</button>
-  <p id="qr-count" class="no-print" style="text-align:center; font-size:13px; color:#6b7280; margin-bottom:16px;"></p>
-
-  <div id="qr-grid" class="qr-grid"></div>
-
-  <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script src="map-image.js?v=29"></script>
-  <script src="map-data.js?v=29"></script>
-  <script>
-    // Địa chỉ trang thật sau khi deploy lên GitHub Pages. Sửa lại đây nếu domain đổi.
-    const guessedBaseUrl = "https://tuyetrojmuaha.github.io/hospital-navigation/index.html";
-    document.getElementById("base-url-input").value = guessedBaseUrl;
-
-    const grid = document.getElementById("qr-grid");
-
-    function renderAllQrCodes() {
-      const baseUrl = document.getElementById("base-url-input").value.trim() || guessedBaseUrl;
-      grid.innerHTML = "";
-      // Chỉ in mã QR cho: điểm đích đến thật (isDestination), cổng ra vào (isGate), và các điểm
-      // lối đi quan trọng đã chọn lọc (isQRPoint - nút giao/gần cổng). KHÔNG in cho từng điểm
-      // mặt bằng lẻ tẻ (quá nhiều, không thực tế để dán tường).
-      const qrEligible = HOSPITAL_MAP.nodes.filter((n) => n.isDestination || n.isGate || n.isQRPoint);
-      qrEligible.forEach((node) => {
-        const card = document.createElement("div");
-        card.className = "qr-card";
-        const canvasHolder = document.createElement("div");
-        card.appendChild(canvasHolder);
-
-        const instructionEl = document.createElement("div");
-        instructionEl.className = "qr-instruction";
-        instructionEl.textContent = "Quét mã QR để tìm đường đi trong Bệnh viện";
-        card.appendChild(instructionEl);
-
-        const nameEl = document.createElement("div");
-        nameEl.className = "qr-name";
-        nameEl.textContent = `Vị trí hiện tại: ${node.name}`;
-        card.appendChild(nameEl);
-
-        const link = `${baseUrl}?node=${encodeURIComponent(node.id)}`;
-
-        grid.appendChild(card);
-
-        // Nội dung mã QR giờ là 1 đường LINK đầy đủ, không còn là mã trần nữa.
-        new QRCode(canvasHolder, {
-          text: link,
-          width: 160,
-          height: 160,
-        });
-      });
-
-      const countEl = document.getElementById("qr-count");
-      if (countEl) countEl.textContent = `Sẽ in ${qrEligible.length} mã QR (trong tổng số ${HOSPITAL_MAP.nodes.length} điểm trên bản đồ).`;
-    }
-
-    document.getElementById("base-url-input").addEventListener("change", renderAllQrCodes);
-    renderAllQrCodes();
-  </script>
+  <header class="app-header">🖨️ In mã QR dán tường</header>
+  <main class="admin-main">
+    <div class="admin-controls no-print">
+      <h1>Chuẩn bị mã QR</h1>
+      <p>Chỉ tạo mã cho các vị trí thuộc phạm vi dẫn đường. B09, B14 và B15 được giữ ngoài phạm vi.</p>
+      <label for="base-url-input">Địa chỉ đầy đủ của trang index.html đã triển khai</label>
+      <input id="base-url-input" type="url" spellcheck="false" autocomplete="off">
+      <p class="muted">Khi mở trên web, địa chỉ lấy theo thư mục hiện tại. Khi mở file trên máy, kiểm tra lại địa chỉ mặc định trước khi tạo mã.</p>
+      <label for="qr-location-select">Vị trí cần in</label>
+      <select id="qr-location-select"><option value="">Tất cả vị trí được hỗ trợ</option></select>
+      <div class="button-row">
+        <button id="btn-generate" type="button" class="btn-primary">Tạo mã QR</button>
+        <button id="btn-print" type="button" class="btn-secondary" disabled>In mã đã tạo</button>
+      </div>
+      <p id="qr-status" role="status" aria-live="polite">Đang tải dữ liệu… Nếu thông báo này không đổi, hãy tải lại trang.</p>
+      <p id="qr-error" class="error-text" role="alert" hidden></p>
+      <p class="notice">Quét thử mã bằng điện thoại trước khi in hàng loạt. Mã vị trí và tọa độ chỉ hiện trên màn hình để đối chiếu; bản in chỉ có QR và hai dòng hướng dẫn.</p>
+      <noscript><p class="error-text">Vui lòng bật JavaScript để tạo mã QR.</p></noscript>
+    </div>
+    <div id="qr-grid" class="qr-grid"></div>
+  </main>
 </body>
 </html>
