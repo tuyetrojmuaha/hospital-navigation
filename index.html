@@ -2,21 +2,22 @@
 <html lang="vi">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-LHK0XRQGQG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://googletagmanager.com"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-  gtag('config', 'G-LHK0XRQGQG');
-</script>
+    gtag('config', 'G-LHK0XRQGQG');
+  </script>
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://google.com https://google.com; object-src 'none'; base-uri 'none'; form-action 'self'">
-
+  <!-- DÒNG CSP ĐÃ ĐƯỢC CHUẨN HÓA TOÀN BỘ SUBDOMAIN VÀ PHÂN TÁCH BẰNG DẤU ; CHÍNH XÁC -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://google.com.vn https://google.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://google.com https://google.com https://google.com.vn; object-src 'none'; base-uri 'none'; form-action 'self'">
+  
   <title>Chỉ đường trong Bệnh viện</title>
   <link rel="stylesheet" href="style.css?v=20260923-4">
   <script defer src="map-image.js?v=20260923-4"></script>
@@ -24,6 +25,7 @@
   <script defer src="navigation-core.js?v=20260923-4"></script>
   <script defer src="app.js?v=20260923-4"></script>
 </head>
+
 <body>
   <header class="app-header">🏥 Chỉ đường trong Bệnh viện</header>
   <main>
