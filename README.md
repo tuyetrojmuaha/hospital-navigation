@@ -1,6 +1,6 @@
 # Chỉ đường trong Bệnh viện
 
-Bản sửa ngày 23/09/2026, phiên bản 2026-09-23.4. Ứng dụng tĩnh, không cần backend hoặc cơ sở dữ liệu.
+Bản sửa ngày 23/09/2026, phiên bản 2026-09-23.5. Ứng dụng tĩnh, không cần backend hoặc cơ sở dữ liệu.
 
 ## Phạm vi đã thống nhất
 
